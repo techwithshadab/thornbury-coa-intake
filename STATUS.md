@@ -2,7 +2,7 @@
 status: amber                 # green | amber | red
 milestone_current: working slice
 milestone_position: behind    # on-track | ahead | behind
-updated: 2026-08-29
+updated: 2026-08-30
 next_milestone: decision rules against SPEC-7 — target TBD
 ---
 
@@ -24,12 +24,19 @@ _The frame is built and green; the judgement is not built. Every document curren
 - **Focus:** the SPEC-7 assessment in `app.decide()`, and the extraction that feeds it.
 
 ## Next
+The rulings in `docs/working-answers.md` are decided but **not implemented** — they are documented policy,
+not code. In order:
+
+- Externalise the rulings as reviewed policy data (`reference/policy.json`) so overturning one is a data
+  change with a review, not a code change. Required by the `decisioning_or_scoring` invariants.
 - Compile step: certificate text → `Certificate` (`extraction` → `raw` → `domain`). Currently missing;
   `cli.run` hands `decide()` an empty certificate.
 - The SPEC-7 rules: limits (§2), reportable method (§3.1), withdrawn revision (§4), stated-conformance
-  contradicting the result (§5), supplier not on the master.
+  contradicting the result (§5), supplier not on the master — plus the hold routing of ADR-0005 and the
+  date ladder of ADR-0006.
 - A labelled evaluation set. Without one, no change to extraction or the rules can be *measured*, only
-  asserted — and `CLAUDE.md` names this as an invariant that does not yet hold.
+  asserted — and `CLAUDE.md` names this as an invariant that does not yet hold. **Every projected number
+  in `working-answers.md` is arithmetic over 36 documents, not a measurement.**
 
 ## Not built, deliberately — with the reason
 - **OCR.** Out of scope per the engagement brief. The seam is `extraction.Extractor`; the one
@@ -41,7 +48,7 @@ _The frame is built and green; the judgement is not built. Every document curren
 ## Open questions — NOT ours to answer
 The full register — the evidence behind each question, who owns it, and the assumption we run on until
 it is answered — is **[`docs/open-questions.md`](docs/open-questions.md)**: 21 questions routed to their
-owner, 10 stated assumptions, and one we refuse to make. Kept there rather than restated here; two
+owner and 10 stated assumptions. Kept there rather than restated here; two
 half-true copies of the same list is how a register stops being read.
 
 **None of them has an owner or a date. That is the largest risk on this engagement.** The three that
@@ -55,10 +62,14 @@ block work rather than merely shadow it:
   master is stale, or unapproved material is arriving. Both want someone looking today.
 
 Also unowned and material: whether certificate content may leave Thornbury's network (blocks go-live
-gate B4), and whether these 36 documents are representative — a third carry an anomaly, against Denis's
-floor estimate of "a handful a month."
-- **Volume, peak, and turnaround.** "North of four hundred a week" and no peak figure or turnaround
-  commitment. Not asked at kick-off.
+gate B4); volume, peak and turnaround (never asked at kick-off — our miss); and whether these 36
+documents are representative — **half of them (18/36) carry an anomaly**, against Denis's floor estimate
+of "a handful a month" out of ~1,600.
+
+**We are not waiting on them.** [`docs/working-answers.md`](docs/working-answers.md) records a
+provisional, reversible ruling for each — what we build on, the business reason, what it costs if wrong,
+and who overturns it. Three were architectural enough to become ADRs (0004 release stance, 0005 hold
+routing, 0006 date ladder). Three we still decline to make; they are listed there too.
 
 ## Risks / blockers
 - **No evaluation set** — solutioner. Every quality claim about this system is currently unfalsifiable.

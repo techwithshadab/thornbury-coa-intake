@@ -10,6 +10,9 @@
 >
 > Drafted as notes you can actually send — five, one per stakeholder, with the sending order and what is
 > blocked on what — in **[`questions-to-send.md`](questions-to-send.md)**.
+>
+> **We are not waiting on the answers.** The provisional ruling we build on for each, with the business
+> consequence and the cost of being wrong, is in **[`working-answers.md`](working-answers.md)**.
 
 ---
 
@@ -33,10 +36,13 @@ Two suppliers on the approved master — **Ardennes Fine Ingredients** and **Kow
 in none of the 36 documents. So the master has names with no traffic, and the traffic has names not on
 the master.
 
-Roughly **12 of 36** documents (33%) carry at least one thing that a person, not a rule, currently
-decides. Denis estimated "a handful a month" out of ~1,600. If this sample is representative of *all*
-intake rather than a deliberately hard set, the true rate is far higher than the floor believes — and
-that is itself a finding worth putting in front of him.
+**Exactly 18 of 36 documents — half the sample — carry at least one of these.** The other 18 are clean on
+every dimension. Denis estimated "a handful a month" out of roughly 1,600. If this sample resembles
+normal intake rather than a deliberately hard set, the true rate is two orders of magnitude above what
+the floor believes — and that is a bigger finding than the data entry.
+
+*(An earlier draft of this file said "roughly 12 of 36, 33%." That was an undercount: the flagged set is
+18. The clean set is listed in [`working-answers.md`](working-answers.md) so the split can be checked.)*
 
 ---
 
@@ -245,7 +251,7 @@ person who owns the question can see what their silence is currently buying.
 | # | Assumption | Why we made it | What breaks if it is wrong | How it gets killed |
 |---|---|---|---|---|
 | **A1** | `moisture` and `water_content` name the same attribute, and the real disagreement is about **method**, not vocabulary. | SPEC-7 §3.2 distinguishes M-04 from M-03 on exactly these grounds; it explains how two people can both be right. | The ERP's single `moisture_pct` is mixing two measurements, and reconciling ERP against QA on that column is meaningless. | Marisol confirms or denies in one sentence (Q1). |
-| **A2** | Holding when uncertain is cheaper than accepting when uncertain, so ambiguity resolves to `hold`. | Denis's own framing, and the only defensible default absent a ratio. | Over-holding is penalised by the ledger and by the intake team. A system that holds a third of intake has not replaced the typing. | Denis and Priya give a cost ratio, or a target hold rate (Q6, Q11). |
+| **A2** | Holding when uncertain is cheaper than accepting when uncertain, so ambiguity resolves to `hold`. | Denis's own framing, and the only defensible default absent a ratio. | Over-holding is penalised by the ledger and by the intake team. A system that holds 40% of intake has not replaced the typing. | Denis and Priya give a cost ratio, or a target hold rate (Q6, Q11). |
 | **A3** | A date that reads two ways is **not** normalised by guessing. COA-0010, COA-0035, COA-0036 hold unless a convention is sanctioned. | The engagement's own validator rejects ambiguous dates on purpose: a date that reads two ways "has not been normalised; it has been passed on." | We hold 3 documents we could have resolved — one of them (Halewood) from evidence already in the corpus. | Denis sanctions per-supplier convention inference, or rules it out (Q7). |
 | **A4** | We do **not** write a retest date into `expiry_date`, and we do **not** compute a missing retest date from manufacture + 24 months. | It is a decision about Purchasing's reorder logic, made for a team not in the room. Certificates are consistent at +24 months, which makes inventing one easy — and that is what makes it dangerous. | Every lot needs `expiry_date` and the ERP will not save without it, so this blocks lot creation until answered. It is the tightest coupling between an unanswered question and a broken path. | Purchasing states what the field means and what to do when the source is absent (Q14). |
 | **A5** | A supplier not on the approved master is a `hold`, not a reject — and the master is treated as current. | The ERP will refuse the lot anyway, so holding costs nothing extra. Rejecting asserts something about the supplier relationship that is not ours. | If the master is stale we add friction with no safety value; if it is accurate, three unapproved suppliers are shipping material and that needs escalating today, not queueing. | IT/Purchasing confirm the master's currency and the three names (Q15). |
@@ -255,12 +261,23 @@ person who owns the question can see what their silence is currently buying.
 | **A9** | Results are canonicalised to SPEC-7 units before comparison — ppb → ppm — and the conversion is recorded. | SPEC-7 §2 requires exactly this. Two documents need it (COA-0027, COA-0031); both pass after conversion and would falsely fail without. | Comparing 7276 ppb against a limit of 10 ppm rejects two clean lots. | Not open — it is a spec requirement, implemented as a stated invariant. |
 | **A10** | Nothing in scope is personal data. | Certificates carry company and analytical data. The only personal fields we saw are QA analyst initials, which we do not consume. | If certificates carry named signatories in the real corpus, `handles_pii` flips and retention/redaction obligations attach. | Confirmed against a real (not sampled) batch. |
 
-### The assumption we refuse to make
+### The assumptions we refuse to make
 
-**That the accept/hold threshold can be set by us.** It encodes Thornbury's tolerance for a recall
-against its tolerance for delay. We can build the mechanism, measure it, and show the trade-off curve.
-Choosing the point on that curve is the client's, and picking it quietly would be the clearest possible
-case of doing something that was not ours to do.
+Three, and they are the ones where a wrong choice binds Thornbury to something they cannot easily undo.
+Each is set out in [`working-answers.md`](working-answers.md) with what we did instead:
+
+1. **That the accept/hold threshold can be set by us.** It encodes Thornbury's tolerance for a recall
+   against its tolerance for delay. We can build the mechanism, measure it, and show the trade-off curve;
+   choosing the point on it is the client's. *What we did instead:* set an inert placeholder and showed
+   that it does not currently bind, because every hold this system issues is rule-mandated by SPEC-7
+   rather than chosen by us.
+2. **That the system may release a lot.** *What we did instead:* declined the capability entirely — the
+   ERP already defaults to `held` and a person releases (ADR-0004).
+3. **That we may decide what `expiry_date` should mean.** *What we did instead:* preserved exactly what
+   the intake team does today, and refused to invent a date where the certificate carries none.
+
+The pattern: where the decision would bind them, we either kept the current behaviour or declined the
+capability — rather than choosing well on their behalf.
 
 ---
 
