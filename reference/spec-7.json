@@ -1,0 +1,35 @@
+{
+  "attributes": [
+    {
+      "attribute": "Assay",
+      "lower": 99.0,
+      "reportable_method": "HPLC (SPEC-7 M-01)",
+      "unit": "%",
+      "upper": 101.0
+    },
+    {
+      "attribute": "Moisture",
+      "lower": 0.0,
+      "reportable_method": "Karl Fischer (SPEC-7 M-04)",
+      "unit": "%",
+      "upper": 0.5
+    },
+    {
+      "attribute": "Heavy Metals",
+      "lower": 0.0,
+      "reportable_method": "ICP-MS (SPEC-7 M-11)",
+      "unit": "ppm",
+      "upper": 10.0
+    },
+    {
+      "attribute": "Bulk Density",
+      "lower": 0.45,
+      "reportable_method": "USP <616> (SPEC-7 M-21)",
+      "unit": "g/mL",
+      "upper": 0.75
+    }
+  ],
+  "document": "SPEC-7",
+  "effective": "1 March 2026",
+  "revision": "D"
+}

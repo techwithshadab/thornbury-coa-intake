@@ -1,0 +1,59 @@
+# Thornbury CoA intake — package config.
+# Toolchain pins are EXACT, not floors: these tools decide pass/fail, so a floor would make
+# whatever released this week part of the gate. `ruff` must stay identical to the `rev:` in
+# .pre-commit-config.yaml — ruff's formatter changes output between releases, and a mismatch makes
+# `make check` unwinnable (the hook rewrites a file one way, `ruff format --check` rejects it).
+# Bump both in the same commit.
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coa-intake"
+version = "0.1.0"
+description = "Reads supplier Certificates of Analysis and decides, against SPEC-7, whether a lot is accepted or held for a human."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "pydantic>=2,<3",     # the trust boundary (raw.py): strict models, extra='forbid'
+]
+
+[project.scripts]
+coa-intake = "coa_intake.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.16.1",       # MUST equal .pre-commit-config.yaml rev
+    "pytest==9.1.1",   # 8.3.4 carries PYSEC-2026-1845; caught by `make audit`
+    "pip-audit==2.7.3",   # the CVE gate in `make audit`
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+# Hermetic + order-independent: the suite must not depend on wall-clock, network, or file order.
+addopts = "-q"
+
+[tool.ruff]
+src = ["src", "tests"]
+line-length = 110
+# `.claude/` is agent tooling the engine scaffolder vendors in — not this repo's source, and any fix
+# made there is reverted by the next re-scaffold. `.venv/` is the local toolchain.
+exclude = [".claude", ".venv"]
+
+[tool.ruff.lint]
+# C901 is the complexity ceiling (universal core: "a complexity ceiling where the stack supports it").
+select = ["E", "F", "I", "B", "C901", "UP"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.uv]
+# The interpreter is a PINNED INPUT, not "whatever python is on PATH". Without this, uv adopts any
+# system interpreter matching requires-python — on the machine this repo was stood up on that was an
+# Anaconda 3.11.5 with a broken `_ctypes` (missing libffi), which took out the CVE audit and would
+# have taken out anything else touching ctypes. `only-managed` makes uv download and use its own
+# CPython, so two clones get the identical interpreter.
+python-preference = "only-managed"

@@ -1,0 +1,92 @@
+# ============================================================
+# MathCo Standard .pre-commit-config.yaml
+#
+# This ships as `.pre-commit-config.yaml` in the scaffold. To activate in a clone:
+#   1. Install pre-commit:    uv pip install pre-commit   (or: pip install pre-commit)
+#   2. Install the hooks:     pre-commit install
+#   3. (Optional) full scan:  pre-commit run --all-files
+#   4. Add `pre-commit run --all-files` as a required check in CI
+#
+# WHAT THIS ENFORCES (automatically, on every commit):
+#   - No secrets committed                  (gitleaks)
+#   - No files larger than 5 MB             (check-added-large-files)
+#   - No merge conflict markers             (check-merge-conflict)
+#   - Valid YAML / JSON / TOML              (check-yaml / check-json / check-toml)
+#   - Private keys never committed          (detect-private-key)
+#   - Consistent line endings & whitespace  (end-of-file-fixer, trailing-whitespace, mixed-line-ending)
+#   - Python lint and format                (ruff)
+#   - JS / TS / Markdown / YAML format      (prettier)
+#
+# WHY THIS MATTERS:
+#   Pre-commit hooks shift hygiene from "discipline we hope for" to
+#   "infrastructure that enforces." Most repo-cleanliness incidents
+#   (committed secrets, gigabyte-sized data files, broken JSON) become
+#   structurally impossible once this is in place.
+# ============================================================
+
+repos:
+  # --- Core hygiene ---
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=5120"] # 5 MB ceiling — adjust per repo only with reason
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: detect-private-key
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  # --- Secret scanning (catches credentials before they enter git history) ---
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  # --- Python: ruff handles lint AND format (replaces flake8 + isort + black) ---
+  # KEEP THIS REV AND THE PROJECT'S OWN ruff PIN IDENTICAL. When a repo also runs ruff from its
+  # own environment (the repo-fitness base-template Makefile wires `make lint` to it), the two
+  # must be the SAME VERSION. ruff's formatter changes its output between releases, so a mismatch
+  # makes `make check` unwinnable: the hook rewrites a file one way, the project's own
+  # `ruff format --check` rejects it, and reformatting by hand is undone on the next run.
+  # Seen for real — rev v0.8.0 here against `ruff>=0.4` in a pyproject that resolved to 0.16.1;
+  # they disagreed about assert-message parenthesisation, on a file the pack itself ships.
+  # On `pre-commit autoupdate`, bump the project's pin to match in the SAME commit.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.1
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # --- JS / TS / Markdown / YAML formatting ---
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, json, markdown, yaml]
+        exclude: '^(\.pre-commit-config\.yaml|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'
+
+# ============================================================
+# OPERATIONAL NOTES
+#
+# Updating hook versions:
+#   pre-commit autoupdate          # refresh all `rev:` values to latest
+#
+# Running hooks manually:
+#   pre-commit run --all-files     # full repo scan
+#   pre-commit run <hook-id>       # just one hook
+#
+# Skipping a hook on a single commit (use sparingly, leaves a paper trail):
+#   SKIP=hook-id git commit -m "..."
+#
+# Bypassing all hooks (use even more sparingly):
+#   git commit --no-verify
+#   ^ This should be a red flag in code review. Don't do it unless
+#     the alternative is worse and you've documented why.
+# ============================================================

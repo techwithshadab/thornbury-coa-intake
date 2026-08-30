@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Engine git rails — push-time checks.
+#
+# Push is the moment a mistake stops being yours and becomes everyone's.
+# Everything blocked here is either unrecoverable or destroys someone else's work.
+#
+# BLOCKS:
+#   - rewriting history on a protected branch (the classic "where did my commits go")
+#   - deleting a protected branch
+#   - an oversized blob anywhere in the outgoing commits (catches a bypassed pre-commit)
+#
+# WARNS:
+#   - pushing somewhere that is not 'origin'
+#   - pushing a long chain of unreviewed commits straight to a protected branch
+
+set -uo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+. "$DIR/lib.sh"
+
+REMOTE="${1:-origin}"
+ZERO='0000000000000000000000000000000000000000'
+
+if [ "$REMOTE" != "origin" ]; then
+    warn "Pushing to '$REMOTE', not 'origin'." \
+         "Repos with several remotes are how internal work reaches the wrong place." \
+         "Check where that points before continuing:  git remote -v"
+fi
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    [ -z "${local_ref:-}" ] && continue
+    BR="${remote_ref#refs/heads/}"
+
+    # --- BLOCK: deleting a protected branch ---
+    if [ "$local_sha" = "$ZERO" ]; then
+        if is_protected "$BR"; then
+            die "Deleting protected branch '$BR' on $REMOTE." \
+                "Everyone's clones and every open branch are cut adrift from it." \
+                "If the branch really should go, do it in the host UI where it is logged and reversible."
+        fi
+        continue
+    fi
+
+    # New branch on the remote — no history to rewrite.
+    [ "$remote_sha" = "$ZERO" ] && RANGE="$local_sha" || RANGE="$remote_sha..$local_sha"
+
+    # --- BLOCK: history rewrite on a protected branch ---
+    if [ "$remote_sha" != "$ZERO" ] && ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+        if is_protected "$BR"; then
+            die "This push rewrites history on protected branch '$BR'." \
+                "Commit $(git rev-parse --short "$remote_sha") is on the remote but not in your history — someone else pushed while you worked, and this push would delete their commits." \
+                "Bring their work in first, then push normally:" \
+                "  git pull --rebase $REMOTE $BR" \
+                "If the rebase gets messy, you can always back out with:  git rebase --abort" \
+                "Never resolve this with --force. That is the destructive option, not the quick one."
+        else
+            warn "Force-updating '$BR' (not protected, so allowed)." \
+                 "Fine on a branch only you use. If anyone else has it checked out, their next pull will break."
+        fi
+    fi
+
+    # --- BLOCK: oversized blob in the outgoing range ---
+    LIMIT=$(( RAILS_MAXBLOBMB * 1024 * 1024 ))
+    BIG="$(git rev-list --objects "$RANGE" 2>/dev/null \
+           | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' 2>/dev/null \
+           | awk -v lim="$LIMIT" '$1=="blob" && $3>lim {printf "%s (%.1f MB)\n", $4, $3/1048576}' \
+           | sort -u | head -5 || true)"
+    if [ -n "$BIG" ]; then
+        die "Outgoing commits contain a file over the ${RAILS_MAXBLOBMB} MB ceiling: $(printf '%s' "$BIG" | tr '\n' ' ')" \
+            "Once this reaches the remote it is in everyone's clone forever, and only a history rewrite removes it." \
+            "It is still cheap to fix because it has not been pushed yet. See RECOVERY.md, 'I committed a huge file'." \
+            "  git rebase -i $remote_sha     # drop or edit the commit that added it"
+    fi
+
+    # --- WARN: unreviewed pile heading at a protected branch ---
+    if is_protected "$BR" && [ "$remote_sha" != "$ZERO" ]; then
+        N="$(git rev-list --count "$RANGE" 2>/dev/null || echo 0)"
+        if [ "$N" -gt 10 ]; then
+            warn "Pushing $N commits straight to '$BR'." \
+                 "That is a large change arriving with no review seam — 'no artifact, no review'." \
+                 "Consider a branch and a PR so it can be reviewed as one artifact."
+        fi
+    fi
+done
+
+exit 0

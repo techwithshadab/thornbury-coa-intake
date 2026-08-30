@@ -1,0 +1,43 @@
+# CODEOWNERS — review routing, and the CANONICAL role→path map on EVERY host (ADR-0022, the host-adapter
+# interface). GitHub/GitLab parse this file natively. Azure DevOps has no CODEOWNERS file, so on ADO the
+# same routing is GENERATED from THIS file into "Automatically included reviewers" branch policies (never
+# hand-authored) — see packs/host/azure-devops/. This file stays the source of truth; the host policy is a
+# layer over it, and CODEOWNERS↔policy drift is a repo-health finding, not a silent divergence.
+# Fill the @handles per engagement; the seat → handle mapping comes from instances/<name>/.
+# Seats are referenced by role, never by seniority (brief §7).
+
+# Accepted ADRs are append-only and design-owned: changes to the decisions path
+# route to the solutioner-of-record (brief §8).
+/decisions/         @solutioner-of-record
+
+# The change log and status are the delivery lead's assurance surface.
+/CHANGELOG.md       @delivery-lead
+/STATUS.md          @delivery-lead
+
+# Add path-specific owners as the repo grows, e.g.:
+# /infra/           @technical-lead
+# /src/api/         @technical-lead
+
+# Solution architecture reviewers (design-phase review, ADR-0016) are deliberately NOT
+# listed here. They get repo READ access — comment and submit PR reviews, cannot push —
+# and must NOT be required approvers. A required-approval entry would be a merge veto,
+# which ADR-0016 forbids: the solutioner-of-record decides and merges over unresolved
+# comments (the ADR-0015 dissent flow). Configure branch protection to require a PR, but
+# NOT to require reviewer approval, for the design branch. (On Azure DevOps: an "Automatically
+# included reviewers" policy set OPTIONAL — isBlocking=false — never Required; ADO can't restrict a
+# reviewer to comment-only, so "no veto" is the optional-policy setting plus reviewer discipline.)
+
+# --- Engineering areas (repo-fitness core: >=2 reviewers per area, roles not people) ---
+# A single owner is a single point of failure at exactly the moment review matters.
+/src/               @solutioner-of-record @tech-lead
+/tests/             @solutioner-of-record @tech-lead
+/tools/             @solutioner-of-record @tech-lead
+
+# Reviewed truth. A change here changes what the system accepts, without any code changing.
+/reference/         @solutioner-of-record @tech-lead
+# The vendored controlled documents. Quality owns SPEC-7; a change here must be traceable to a revision.
+/reference/source/  @solutioner-of-record @tech-lead @quality-owner
+
+# The contract and the invariants.
+/CLAUDE.md          @solutioner-of-record @tech-lead
+/REPO-SURFACE.yaml  @solutioner-of-record @tech-lead

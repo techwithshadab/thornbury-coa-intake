@@ -1,0 +1,25 @@
+# engine.yaml — the identity manifest every engine tool reads first (ADR-0011, the identity spine).
+# Authority for engagement_id is Cortex (the SOW reference-ID registry, central team); this file is a RECONCILED
+# POINTER, not the source of truth (the gstack .gbrain-source correction). Keep it reconciled — a
+# manifest that drifts from the registry is the failure to watch for.
+opportunity_id:
+engagement_id: SOW-2026-CAP-01
+slug: thornbury-coa-intake
+workstream_id: []                       # born at gate-in; one engagement -> N workstreams
+archetype: B                              # delivery archetype (A | B)
+data_classification: confidential
+owners:
+  pm: TBD
+  tl: TBD
+  solutioner: Shadab Hussain
+  dl: TBD
+systems_of_record:
+  jira:
+  confluence:
+  finance:
+gate_status: pre-gate-in
+# host:        # (optional) github | gitlab | azure-devops — activates packs/host/<host>/ (ADR-0022)
+required_controls:
+  - redact-prepush
+  - branch-protection
+  - pre-commit

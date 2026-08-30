@@ -1,0 +1,38 @@
+# Engine git rails — safe commands.
+#
+# Wired in by install-rails.sh as an include from .git/config, so editing this
+# file takes effect immediately with no reinstall. Tracked in the repo, which
+# means the whole team gets the same vocabulary and it survives a fresh clone
+# (after one `.githooks/install-rails.sh`).
+#
+# Each alias exists because it is shorter to type than the dangerous command it
+# replaces. That is the whole mechanism.
+
+[alias]
+	# Replaces `git pull`. Fast-forwards when that is safe, and when histories
+	# have diverged it stops and explains rather than dropping you into a rebase.
+	sync = "!./.githooks/bin/rails sync"
+
+	# Snapshot everything — tracked, staged and untracked — without changing a
+	# single thing in the working tree. Press before anything that feels risky.
+	panic = "!./.githooks/bin/rails panic"
+
+	# List what panic saved.
+	rescues = "!./.githooks/bin/rails rescues"
+
+	# Undo the last commit and KEEP the work staged. The safe half of
+	# `reset --hard`. Refuses if the commit is already on origin, and points
+	# at `git revert` instead.
+	undo = "!./.githooks/bin/rails undo"
+
+	# "I think I lost work." Reads the reflog back in plain language and gives
+	# the exact command to return to any earlier state.
+	oops = "!./.githooks/bin/rails oops"
+
+	# New branch, from an up-to-date base rather than whatever stale commit
+	# happened to be checked out.
+	nb = "!./.githooks/bin/rails nb"
+
+	# One screen of orientation: branch, protected or not, identity, dirt,
+	# ahead/behind, remotes.
+	where = "!./.githooks/bin/rails where"
