@@ -39,29 +39,24 @@ _The frame is built and green; the judgement is not built. Every document curren
 - **A query surface over the audit trail.**
 
 ## Open questions — NOT ours to answer
-These are decisions that belong to Thornbury. Recording them is the work; answering them alone would be
-the failure. None is currently owned.
+The full register — the evidence behind each question, who owns it, and the assumption we run on until
+it is answered — is **[`docs/open-questions.md`](docs/open-questions.md)**: 21 questions routed to their
+owner, 10 stated assumptions, and one we refuse to make. Kept there rather than restated here; two
+half-true copies of the same list is how a register stops being read.
 
-- **`retest_date` is not `expiry_date`.** The ERP requires `expiry_date`, Purchasing runs reorder logic
-  off it, and the certificate gives a retest date. Denis Achebe has never been comfortable that these
-  are treated as the same thing. Writing a retest date into a field that drives reordering is a decision
-  with a consequence, and it is Priya's and Purchasing's to make. **Owner: unassigned. Purchasing is not
-  yet engaged.**
-- **Is `moisture` the same as QA's `water_content`?** Denis has been told by two people that it is and
-  is not. SPEC-7 §3.2 gives the shape of an answer — Karl Fischer is the sole reportable method for
-  moisture, and loss on drying over-reads on hygroscopic material — which suggests the disagreement is
-  about *method*, not vocabulary. That is a hypothesis, not a ruling. **Owner: Quality (Marisol Vega).**
-- **ERP or QA tracker — which is authoritative when they disagree?** Priya said the ERP is the system of
-  record; Denis said QA are the ones who actually check; Marisol was not on the call. This system writes
-  into one of them and is measured against both. **Owner: unassigned. Marisol has not been engaged and,
-  per Denis, should have been.**
-- **The ERP has nowhere to put the method.** SPEC-7 §3.1 makes the method part of whether a result counts
-  at all. A request to add the field has been open since March, unprioritised. Until then, a lot can be
-  accepted here on a correct method and stored there with no record of it. **Owner: IT.**
-- **How does this repo learn that SPEC-7 has been revised?** §3.3 requires a controlled notification to
-  *suppliers*; nothing covers downstream systems. Until settled, a revision silently leaves this repo
-  asserting a withdrawn rule. **Owner: Quality.**
-- **Document retention.** Nobody raised it at kick-off and we did not ask.
+**None of them has an owner or a date. That is the largest risk on this engagement.** The three that
+block work rather than merely shadow it:
+
+- **Q14 — `retest_date` is not `expiry_date`** (Purchasing, not engaged). A required ERP field with no
+  agreed source, and two documents in the sample carry no retest date at all. Blocks lot creation.
+- **Q18 — ERP or QA tracker, which is authoritative?** (unassigned; Marisol Vega not engaged). Decides
+  what "correct" means, so every other answer inherits from it. Open for years; this project forces it.
+- **Q15 — three suppliers in the sample are not on the approved master** (IT / Purchasing). Either the
+  master is stale, or unapproved material is arriving. Both want someone looking today.
+
+Also unowned and material: whether certificate content may leave Thornbury's network (blocks go-live
+gate B4), and whether these 36 documents are representative — a third carry an anomaly, against Denis's
+floor estimate of "a handful a month."
 - **Volume, peak, and turnaround.** "North of four hundred a week" and no peak figure or turnaround
   commitment. Not asked at kick-off.
 

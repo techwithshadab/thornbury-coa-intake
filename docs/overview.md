@@ -63,15 +63,18 @@ reference/
   *.json          DERIVED — do not hand-edit; run `make reference`
 tests/            the suite, incl. the invariant tests
 docs/
-  overview.md     this file
-  reference/      how each part works TODAY
+  overview.md         this file
+  open-questions.md   what is NOT ours to decide, by owner, + the assumptions we run on
+  reference/          how each part works TODAY
 decisions/        append-only ADRs
 reviews/          gate records
 REPO-SURFACE.yaml what this repo is (the router for the repo-fitness bar)
 ```
 
 ## Doc map
+- **What we could not decide alone → [`docs/open-questions.md`](open-questions.md)** — 21 questions
+  routed to their owner with the evidence behind each, 10 stated assumptions, and one we refuse to make
 - Engineering contract & invariants → `CLAUDE.md`
 - Repo standards & branch protection → `CONVENTIONS.md`
 - How-it-works-today → `docs/reference/`
-- Decisions → `decisions/` · Current state and open questions → `STATUS.md`
+- Decisions we *did* make → `decisions/` · Current state → `STATUS.md`
