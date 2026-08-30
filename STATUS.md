@@ -1,7 +1,7 @@
 ---
 status: amber                 # green | amber | red
 milestone_current: working slice
-milestone_position: behind    # on-track | ahead | behind
+milestone_position: on-track  # on-track | ahead | behind
 updated: 2026-08-30
 next_milestone: decision rules against SPEC-7 — target TBD
 ---
@@ -14,26 +14,27 @@ next_milestone: decision rules against SPEC-7 — target TBD
 
 # STATUS — thornbury-coa-intake (SOW-2026-CAP-01)
 
-_The frame is built and green; the judgement is not built. Every document currently returns `hold`._
+_Rules wired against SPEC-7 under `reference/policy.json`. On the 36 supplied documents: 22 accept,
+14 hold. No labelled set yet, so that split is arithmetic, not a measurement._
 
 ## Now
-- **Milestone:** working slice — **behind**. Boundaries, reference data, the submission contract and the
-  full check ritual are in place and passing. `app.decide()` is a stub: it returns `hold` with
-  "rules not implemented" for every document. That is honest, and it is not a shippable posture — the
-  ledger penalises over-holding as well as over-accepting.
-- **Focus:** the SPEC-7 assessment in `app.decide()`, and the extraction that feeds it.
+- **Milestone:** working slice — **on-track**. Deterministic parser (ADR-0007) and the SPEC-7 rules
+  are wired, with every ruling held as reviewed data in `reference/policy.json`. `make check` is green
+  with no skips, and a clean clone reproduces `submissions/decisions.jsonl` byte-for-byte.
+- **The split matches the hand analysis exactly** — 22/14, document for document, predicted in
+  `docs/working-answers.md` before the code existed. That is a consistency check between two
+  independent routes to the same answer. **It is not evidence the answers are right**: both routes are
+  ours, and there is still no labelled set.
+- **Focus:** deliverables 2, 4 and 6 (deployment plan, handover package, working log) — all missing.
 
 ## Next
 The rulings in `docs/working-answers.md` are decided but **not implemented** — they are documented policy,
 not code. In order:
 
-- Externalise the rulings as reviewed policy data (`reference/policy.json`) so overturning one is a data
-  change with a review, not a code change. Required by the `decisioning_or_scoring` invariants.
-- Compile step: certificate text → `Certificate` (`extraction` → `raw` → `domain`). Currently missing;
-  `cli.run` hands `decide()` an empty certificate.
-- The SPEC-7 rules: limits (§2), reportable method (§3.1), withdrawn revision (§4), stated-conformance
-  contradicting the result (§5), supplier not on the master — plus the hold routing of ADR-0005 and the
-  date ladder of ADR-0006.
+- **The deployment plan and the handover package** (deliverables 2 and 4), and the **working log**
+  (deliverable 6).
+- Withdrawn-revision detection (SPEC-7 §4). The staleness dates are in `policy.json` and nothing reads
+  them yet — a certificate citing rev C would currently pass unremarked.
 - A labelled evaluation set. Without one, no change to extraction or the rules can be *measured*, only
   asserted — and `CLAUDE.md` names this as an invariant that does not yet hold. **Every projected number
   in `working-answers.md` is arithmetic over 36 documents, not a measurement.**
@@ -44,11 +45,11 @@ which was a bigger gap than anything technical it turned up.
 
 | # | Deliverable | State |
 |---|---|---|
-| 1 | A working slice | **partial** — frame green, rules wired 2026-08-30 |
+| 1 | A working slice | **done for the supplied corpus** — parser + rules green, 22/14 |
 | 2 | A deployment plan that actually works | **missing** — fragments only (R16, ERP API off the critical path) |
 | 3 | Decision records | **done** — ADR-0001…0007 |
 | 4 | A handover package | **partial** — repo docs exist, no assembled package |
-| 5 | `decisions.jsonl` | **produced**; was gitignored (M1) — fixed, submitted runs tracked in `submissions/` |
+| 5 | `decisions.jsonl` | **done** — `submissions/decisions.jsonl`, passes `validate_submission.py` |
 | 6 | A working log — how AI was used, incl. what it got wrong | **missing** |
 
 Deliverable 6 has at least two entries waiting: the sample anomaly count stated as 12/36 when it is
