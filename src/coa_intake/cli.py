@@ -4,7 +4,7 @@
 
 Both roots are INPUTS. The pipeline is run against documents it has not seen, so a path baked into
 the program is a defect, not a convenience. `paths.py` owns resolution; this module owns argument
-parsing and the write.
+parsing, the walk, and the write.
 
 Every document produces exactly one line. A document that cannot be processed is a `hold` with a
 reason, never a silence — a missing line reads as "no opinion", and there is no such thing here.
@@ -19,21 +19,35 @@ import sys
 
 from . import paths
 from .app import decide
-from .domain import Certificate, Decision
+from .domain import ACCEPT, Decision
 from .extraction import TextFileExtractor
-from .reference import load_spec
+from .parse import parse_certificate
+from .reference import load_policy, load_spec, load_supplier_master
 
 
 def _to_line(decision: Decision) -> dict:
     """Render a Decision into the submission contract. The caller RENDERS the explanation the
-    decision carries; it never reassembles the reasoning itself."""
+    decision carries; it never reassembles the reasoning itself.
+
+    `route` and `explanation` are ours, not the contract's — the submission validator ignores extra
+    keys, and a held lot is useless to Thornbury without knowing whose desk it belongs on.
+    """
     out: dict = {
         "doc_id": decision.doc_id,
         "action": decision.action,
         "schema_version": decision.schema_version,
+        "spec_revision": decision.spec_revision,
     }
-    if decision.action == "hold":
-        out["hold_reason"] = " ".join(f.message for f in decision.findings) or "held without a stated reason"
+
+    if decision.action != ACCEPT:
+        out["hold_reason"] = (
+            " ".join(f"{f.message}{f' [{f.evidence}]' if f.evidence else ''}" for f in decision.findings)
+            or "held without a stated reason"
+        )
+        out["route"] = decision.route
+        out["findings"] = [
+            {"code": f.code, "attribute": f.attribute, "evidence": f.evidence} for f in decision.findings
+        ]
         return out
 
     cert = decision.certificate
@@ -43,31 +57,34 @@ def _to_line(decision: Decision) -> dict:
         "lot_id": cert.lot_id,
         "material_no": cert.material_no,
         "supplier": cert.supplier,
-        "manufacture_date": cert.manufacture_date,
-        "retest_date": cert.retest_date,
+        "manufacture_date": cert.manufacture_date.iso if cert.manufacture_date else None,
+        "retest_date": cert.retest_date.iso if cert.retest_date else None,
         "tests": [
             {
                 "attribute": m.attribute,
                 "result": m.value,
                 "unit": m.unit,
                 "method": m.method,
+                **({"reported_as": f"{m.original_value} {m.original_unit}"} if m.was_converted else {}),
             }
             for m in cert.results
         ],
     }
+    out["explanation"] = decision.explanation
     return out
 
 
 def run(documents_root: pathlib.Path, reference_root: pathlib.Path, out: pathlib.Path) -> int:
     """Walk every document once, decide, write one line each. Returns the number of lines."""
     spec = load_spec(reference_root)
+    policy = load_policy(reference_root)
+    approved = load_supplier_master(reference_root)
     extractor = TextFileExtractor()
+
     lines = []
     for extraction in extractor.extract_all(documents_root):
-        # The compile step from raw text to a Certificate is not built — see app.py. Until it is,
-        # every document arrives at decide() as an empty certificate and comes back a hold.
-        certificate = Certificate(doc_id=extraction.doc_id)
-        lines.append(_to_line(decide(certificate, spec)))
+        certificate = parse_certificate(extraction, policy, approved)
+        lines.append(_to_line(decide(certificate, spec, policy, approved)))
 
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8") as fh:

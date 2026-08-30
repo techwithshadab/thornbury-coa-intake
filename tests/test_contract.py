@@ -18,6 +18,11 @@ from coa_intake.app import decide
 from coa_intake.cli import _to_line, run
 from coa_intake.domain import SCHEMA_VERSION, Certificate, Measurement, Spec, SpecAttribute
 from coa_intake.raw import RawExtraction, RawSpec
+from coa_intake.reference import load_policy, load_supplier_master
+
+REFERENCE = pathlib.Path(__file__).resolve().parents[1] / "reference"
+POLICY = load_policy(REFERENCE)
+APPROVED = load_supplier_master(REFERENCE)
 
 SPEC = Spec(
     document="SPEC-7",
@@ -83,17 +88,20 @@ def test_an_unreported_attribute_is_absent_not_zero():
 
 def test_decide_is_deterministic():
     cert = Certificate(doc_id="COA-0001")
-    assert decide(cert, SPEC) == decide(cert, SPEC)
+    assert decide(cert, SPEC, POLICY, APPROVED) == decide(cert, SPEC, POLICY, APPROVED)
 
 
 def test_every_decision_carries_a_schema_version():
     """Output that crosses a boundary says which contract produced it."""
-    assert _to_line(decide(Certificate(doc_id="COA-0001"), SPEC))["schema_version"] == SCHEMA_VERSION
+    assert (
+        _to_line(decide(Certificate(doc_id="COA-0001"), SPEC, POLICY, APPROVED))["schema_version"]
+        == SCHEMA_VERSION
+    )
 
 
 def test_a_hold_always_states_a_reason():
     """A hold with no reason is a silence with extra steps — someone has to act on it."""
-    line = _to_line(decide(Certificate(doc_id="COA-0001"), SPEC))
+    line = _to_line(decide(Certificate(doc_id="COA-0001"), SPEC, POLICY, APPROVED))
     assert line["action"] == "hold"
     assert line["hold_reason"].strip()
 

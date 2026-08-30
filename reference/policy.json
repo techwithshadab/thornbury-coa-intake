@@ -1,0 +1,184 @@
+{
+  "policy_version": "1.0.0",
+  "status": "provisional",
+  "note": "Every ruling here is PROVISIONAL and owned by someone at Thornbury, not by us. See docs/working-answers.md for the reasoning, the cost of being wrong, and who overturns each one. This file is hand-authored and reviewed; it is NOT derived. reference/spec-7.json and reference/supplier-master.json ARE derived - do not hand-edit those.",
+
+  "spec_staleness": {
+    "ruling": "R4",
+    "owner": "Quality (Marisol Vega)",
+    "warn_after": "2027-03-01",
+    "fail_after": "2027-06-01",
+    "why": "SPEC-7 has an annual review cycle and rev D took effect 2026-03-01. Nobody owns telling this repo that a revision issued, so it assumes its copy goes stale on schedule and says so loudly rather than asserting a withdrawn rule in silence."
+  },
+
+  "unit_conversions": [
+    {
+      "attribute": "Heavy Metals",
+      "from_unit": "ppb",
+      "to_unit": "ppm",
+      "factor": 0.001,
+      "why": "SPEC-7 s2 requires a result in a different unit to be converted before comparison, and the conversion recorded. COA-0027 and COA-0031 report ppb against a ppm limit."
+    },
+    {
+      "attribute": "Heavy Metals",
+      "from_unit": "mg/kg",
+      "to_unit": "ppm",
+      "factor": 1.0,
+      "why": "mg/kg and ppm are the same quantity for solids. Not present in the sample; included because it is the most likely next variant and the conversion is exact."
+    }
+  ],
+
+  "attribute_synonyms": {
+    "ruling": "R1",
+    "owner": "Quality (Marisol Vega)",
+    "why": "Treat these as naming the same attribute. Never merge across METHOD - method is carried separately and is part of whether a result counts at all (SPEC-7 s3.1).",
+    "map": {
+      "Assay": ["assay", "purity", "content", "assay (as is)"],
+      "Moisture": ["moisture", "water content", "water", "loss on drying", "karl fischer water"],
+      "Heavy Metals": ["heavy metals", "heavy metal", "total heavy metals"],
+      "Bulk Density": ["bulk density", "density", "apparent density"]
+    }
+  },
+
+  "supplier_date_conventions": {
+    "ruling": "R7 / ADR-0006",
+    "owner": "Denis Achebe",
+    "min_unambiguous_samples": 3,
+    "why": "A slash date whose components are both <=12 reads two ways. Where a supplier has at least this many unambiguous slash dates in the reviewed corpus AND they all agree, we read the ambiguous one by that convention and stamp it as an INFERENCE in the provenance. Otherwise we hold. The threshold of 3 is weakly grounded - see ADR-0006, which says so plainly.",
+    "conventions": [
+      {
+        "supplier": "Halewood Ingredients",
+        "order": "DMY",
+        "evidence": ["COA-0009:15/03/2026", "COA-0015:25/10/2026", "COA-0022:27/12/2026"],
+        "resolves": ["COA-0035"]
+      },
+      {
+        "supplier": "Brightmoor Botanicals",
+        "order": "MDY",
+        "evidence": ["COA-0008:01/21/2026", "COA-0012:06/22/2026", "COA-0031:06/17/2026"],
+        "resolves": []
+      }
+    ],
+    "explicitly_not_inferred": [
+      {
+        "supplier": "Zeeland Bulk BV",
+        "why": "No unambiguous slash date anywhere in the corpus. The only thing pointing at day/month is that BV is a Dutch company form, which is a guess about a jurisdiction standing in for a fact about a document template. COA-0010 and COA-0036 hold.",
+        "affects": ["COA-0010", "COA-0036"]
+      }
+    ]
+  },
+
+  "rules": [
+    {
+      "id": "supplier_not_approved",
+      "ruling": "R15",
+      "order": 10,
+      "action": "hold",
+      "route": "procurement",
+      "message": "Supplier is not on the approved supplier master. The ERP will not create a lot for it. Either the master is out of date or this material is from an unapproved source - both need someone to look.",
+      "owner": "IT / Purchasing"
+    },
+    {
+      "id": "lot_id_inconsistent",
+      "ruling": "R8",
+      "order": 20,
+      "action": "hold",
+      "route": "supplier_query",
+      "message": "The certificate states two different lot numbers. We will not choose between them - which one is right determines which physical material this is.",
+      "owner": "Denis Achebe"
+    },
+    {
+      "id": "result_outside_limits",
+      "ruling": "R3",
+      "order": 30,
+      "action": "hold",
+      "route": "quality",
+      "message": "A result is outside the SPEC-7 acceptance limits. SPEC-7 s5: non-conforming irrespective of any conformance statement on the certificate.",
+      "owner": "Quality (Marisol Vega)"
+    },
+    {
+      "id": "conformance_contradicts_result",
+      "ruling": "R3",
+      "order": 40,
+      "action": "hold",
+      "route": "quality",
+      "message": "The certificate states conformance for a result that is outside the limits. SPEC-7 s5: the certificate is in error and the lot is referred to Quality. The supplier needs correcting too.",
+      "owner": "Quality (Marisol Vega)"
+    },
+    {
+      "id": "method_not_reportable",
+      "ruling": "R2",
+      "order": 50,
+      "action": "hold",
+      "route": "quality",
+      "message": "An attribute was determined by a method that is not reportable for it under SPEC-7 s2. SPEC-7 s3.1: the result is indicative and cannot be used to determine acceptance. s4: refer to Quality.",
+      "owner": "Quality (Marisol Vega)"
+    },
+    {
+      "id": "attribute_missing",
+      "ruling": "R2",
+      "order": 60,
+      "action": "hold",
+      "route": "quality",
+      "message": "The certificate does not report every attribute SPEC-7 s2 requires. A missing attribute is not a passing one.",
+      "owner": "Quality (Marisol Vega)"
+    },
+    {
+      "id": "date_ambiguous",
+      "ruling": "R7",
+      "order": 70,
+      "action": "hold",
+      "route": "intake_keying",
+      "message": "A date on this certificate reads two ways and no convention resolves it. Nothing is wrong with the lot - we could not read the document.",
+      "owner": "Denis Achebe"
+    },
+    {
+      "id": "retest_date_missing",
+      "ruling": "R14",
+      "order": 80,
+      "action": "hold",
+      "route": "intake_keying",
+      "message": "The certificate states no retest date, and the ERP requires an expiry date. Every certificate that carries both sets retest at manufacture + 24 months, so this COULD be calculated - we will not, because that date drives Purchasing's reorder logic and inventing it is not ours to do.",
+      "owner": "Purchasing"
+    },
+    {
+      "id": "unparseable",
+      "ruling": "ADR-0007",
+      "order": 5,
+      "action": "hold",
+      "route": "intake_keying",
+      "message": "A required field could not be read from this document. Nothing is wrong with the lot - this layout is one the parser does not recognise. It goes back to manual keying, as all volume does today. This rule leads all others (order 5): if the document did not parse, every other finding on it is drawn from fields we may have misread.",
+      "owner": "solutioner-of-record"
+    }
+  ],
+
+  "erp_mapping": {
+    "ruling": "R14",
+    "owner": "Purchasing",
+    "status": "PRESERVES CURRENT PRACTICE - not a recommendation",
+    "map": { "expiry_date": "retest_date" },
+    "why": "The intake team already keys the certificate's retest date into the ERP's expiry_date. They are not the same thing and Denis has said so. We preserve today's behaviour rather than silently changing what Purchasing reorders against; our own output keeps retest_date under its own name so the two are never conflated in OUR record.",
+    "cannot_be_stored_by_erp": ["manufacture_date", "method", "unit_conversion"],
+    "cannot_note": "See docs/open-questions.md C1-C4. The ERP holds less than the certificate states and less than QA records. That is a data-model gap in the ERP, not a mapping we can close."
+  },
+
+  "release": {
+    "ruling": "R12 / ADR-0004",
+    "creates_lot_at_status": "held",
+    "may_set_released": false,
+    "why": "The ERP already defaults status to held and releasing is a separate action. The system does not need the ability to release, so it does not have it. A person releases, exactly as today."
+  },
+
+  "not_decided": [
+    {
+      "what": "The confidence threshold for accept vs hold",
+      "why": "It encodes Thornbury's tolerance for a recall against its tolerance for delay. Every hold this system issues today is mandated by a SPEC-7 rule above, not chosen by us, so no threshold is in force. One becomes necessary only if a non-deterministic extractor is added.",
+      "owner": "Denis Achebe + Priya Raghunathan"
+    },
+    {
+      "what": "Whether a manufacture date in the future should hold the lot",
+      "why": "Ten of 36 certificates carry one. A rule that sensible-sounding would hold 28% of the sample. Not adding it on our own judgement - see Q22.",
+      "owner": "Denis Achebe"
+    }
+  ]
+}

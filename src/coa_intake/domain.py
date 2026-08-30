@@ -1,14 +1,17 @@
 """Compiled domain objects — what the runtime consumes.
 
 The compile step validates raw input once, at load, and emits these typed objects. Runtime walks
-domain objects, never loose dicts. Two laws are visible in the types themselves:
+domain objects, never loose dicts. Three laws are visible in the types themselves:
 
-  * **Provenance.** A measured value is never a bare number. `Measurement` carries value, unit, and
-    the source it was read from, so nobody downstream can mistake an unsourced figure for truth,
-    and a reviewer can find the line on the certificate that produced it.
+  * **Provenance.** A measured value is never a bare number. `Measurement` carries value, unit, the
+    source it was read from, the method that produced it, and — where a unit was converted — what it
+    said before, because SPEC-7 §2 requires the conversion to be *recorded*, not just performed.
   * **Missing is not zero.** An attribute the certificate did not report is absent from `results`,
     not present as 0.0. Absence is a decision input in its own right — SPEC-7 §2 requires every
     attribute, so a missing one is a reason to hold, never a zero to compare against a limit.
+  * **Conformance is per result.** Certificates state PASS against individual attributes, not against
+    the document, and SPEC-7 §5 turns on a per-result contradiction. So the claim lives on the
+    Measurement it is a claim about.
 """
 
 from __future__ import annotations
@@ -17,18 +20,55 @@ from dataclasses import dataclass, field
 
 # Bumped when the shape of an emitted decision changes. Any output that crosses a boundary or is
 # persisted carries this, so a consumer can tell which contract produced the line it is reading.
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
+
+ACCEPT = "accept"
+HOLD = "hold"
+
+# Where a held lot goes (ADR-0005). Four, deliberately: a lot held because a date was unreadable
+# must not consume the attention of the people who rule on quality failures.
+ROUTE_QUALITY = "quality"
+ROUTE_PROCUREMENT = "procurement"
+ROUTE_SUPPLIER_QUERY = "supplier_query"
+ROUTE_INTAKE_KEYING = "intake_keying"
 
 
 @dataclass(frozen=True)
 class Measurement:
     """A measured value with provenance — never a bare number."""
 
-    attribute: str  # the SPEC-7 attribute this measures, canonicalized
-    value: float
+    attribute: str  # canonical SPEC-7 attribute name, after synonym mapping
+    value: float  # in `unit`, already canonical
     unit: str  # canonical unit: converted on write, never at comparison time
     source: str  # doc_id + locator: which document, and where in it
     method: str | None = None  # the method the certificate stated, or None if it stated none
+    stated_conformance: bool | None = None  # what the supplier claimed FOR THIS RESULT, if anything
+    # SPEC-7 §2: "the conversion shall be recorded". These hold what the certificate actually said.
+    original_value: float | None = None
+    original_unit: str | None = None
+
+    @property
+    def was_converted(self) -> bool:
+        return self.original_unit is not None and self.original_unit != self.unit
+
+
+@dataclass(frozen=True)
+class DateReading:
+    """A date, and how confident we are about what it says.
+
+    `resolution` records which rung of the ADR-0006 ladder answered: `explicit` (ISO or a written
+    month), `stated` (the document declared its own convention), `inferred` (a supplier convention
+    drawn from other certificates), or `ambiguous` (nothing resolved it — hold).
+    """
+
+    raw: str
+    iso: str | None = None
+    resolution: str = "ambiguous"
+    evidence: str | None = None  # for `inferred`, the certificates the convention came from
+
+    @property
+    def is_resolved(self) -> bool:
+        return self.iso is not None
 
 
 @dataclass(frozen=True)
@@ -61,11 +101,11 @@ class Certificate:
     lot_id: str | None = None
     material_no: str | None = None
     supplier: str | None = None
-    manufacture_date: str | None = None  # ISO 8601, canonicalized on write
-    retest_date: str | None = None  # ISO 8601. NOT expiry_date — see docs/reference/
+    manufacture_date: DateReading | None = None
+    retest_date: DateReading | None = None  # NOT expiry_date — see docs/working-answers.md R14
     results: tuple[Measurement, ...] = ()
-    stated_conformance: bool | None = None  # what the supplier claimed, which may be wrong
     cited_spec_revision: str | None = None
+    lot_id_conflicts: tuple[str, ...] = ()  # every distinct lot number the document printed, if >1
 
 
 @dataclass(frozen=True)
@@ -73,8 +113,9 @@ class Finding:
     """One structured reason, for callers to RENDER. Callers never reconstruct the reasoning from
     the output — two callers reassembling it would explain the same decision differently."""
 
-    code: str  # stable machine code, e.g. "supplier_not_approved", "result_out_of_limits"
+    code: str  # stable machine code, matching a rule id in reference/policy.json
     message: str  # written for the person who has to act on it
+    route: str | None = None
     attribute: str | None = None
     evidence: str | None = None  # what on the document supports this
 
@@ -89,11 +130,21 @@ class Decision:
     """
 
     doc_id: str
-    action: str  # "accept" | "hold"
+    action: str  # ACCEPT | HOLD
     certificate: Certificate | None = None
     findings: tuple[Finding, ...] = ()
     schema_version: str = SCHEMA_VERSION
+    spec_revision: str | None = None  # which revision this was judged under — see policy R4
     explanation: list[str] = field(default_factory=list)
+
+    @property
+    def route(self) -> str | None:
+        """Where a held lot goes. The most severe route among the findings wins; the ordering is the
+        rule order in policy.json, so the first finding is already the most severe."""
+        for finding in self.findings:
+            if finding.route:
+                return finding.route
+        return None
 
 
 def compile_spec(raw) -> Spec:

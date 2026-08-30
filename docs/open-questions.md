@@ -296,3 +296,91 @@ decisions to and one they have to take on trust.
 
 **And get Marisol Vega in the room.** She owns SPEC-7 and the QA tracker, she owns or co-owns eight of
 the questions above, and she was not at the kick-off. Denis said she should have been. He was right.
+
+---
+
+## Part 3 — What the first round surfaced (round 2)
+
+Written before implementing the rulings. These are the questions, conflicts and contradictions that only
+became visible once we had answers — or working answers — to the first round. Some are for stakeholders;
+some are contradictions in the client's own materials that somebody has to reconcile; two are mistakes we
+made ourselves.
+
+### Contradictions inside Thornbury's own materials
+
+**C1. The ERP has no field for the manufacture date, and the submission contract requires one.**
+`erp-fields.md` lists `received_date` (set by the warehouse, not from the certificate) and `expiry_date`
+— but no manufacture date. Every certificate states one, our output must carry one, and the ERP cannot
+store it. Combined with the missing method field (Q17), **the ERP can hold less than the certificate
+says and less than QA records.** That is not a mapping problem, it is a data-model problem, and it means
+the ERP cannot be the complete record of an incoming lot however good this system gets. *Who: IT +
+Marisol. It sharpens Q18 — the ERP cannot be authoritative about facts it has nowhere to put.*
+
+**C2. `entered_by` is a required ERP field and an automated system has no answer for it.**
+Does an automated lot record a service account, the reviewing analyst, or the person who releases? This
+sounds administrative and is not: `entered_by` is the audit trail's only link to a human, and pointing it
+at a service account quietly removes the person from the record. *Who: Priya + IT.*
+
+**C3. SPEC-7 requires a unit conversion to be "recorded" and nothing in the ERP records it.**
+§2: where a certificate expresses a result in a different unit, "the conversion shall be recorded." Two
+certificates need it. The ERP has `heavy_metals_ppm` and nowhere to say the source said ppb. *We can
+record it in our own output — see the model change below — but the ERP cannot.* Same shape as C1.
+
+**C4. QA's tracker has no manufacture date either.** It has `retest_due`. So *both* systems drop a field
+the certificate states and our contract requires. Worth asking whether anyone needs it, or whether the
+submission contract is asking for something Thornbury genuinely does not use.
+
+### Round-2 questions for stakeholders
+
+**Q22. Ten of the 36 certificates carry a manufacture date in the future.** COA-0006, 0015, 0016, 0020,
+0022, 0028, 0030, 0033, 0034, 0036 — all dated after the day this analysis ran. That is 28% of the
+sample. Either these are forward-dated documents, the sample is synthetic, or something is wrong with how
+dates are being recorded upstream. **We are deliberately NOT adding a "manufacture date cannot be in the
+future" rule**, because on this sample it would hold ten lots, and a rule that sensible-sounding and that
+destructive is exactly the kind we should not add on our own judgement. *Who: Denis.*
+
+**Q23. Does a `hold` need to reach the supplier, or only Thornbury?** ADR-0005 routes holds to four
+internal queues. For `supplier_query` the action is an email to the supplier, which Denis's team does
+today by hand. Is that in scope, and does anyone want it automated? *Who: Denis.*
+
+**Q24. What is the review SLA on a held lot?** Q11 asked what a hold costs. This is the sharper version:
+if a lot sits in the `quality` queue for a week, has the system helped or moved the delay? *Who: Priya +
+Marisol.*
+
+**Q25. Does the ledger's definition of a correct answer match SPEC-7's?** — *see the conflict below.*
+
+### The conflict we cannot resolve, and are taking knowingly
+
+**The client's written rule and the scoring instrument may disagree.**
+
+Three certificates (COA-0004, 0026, 0029) report moisture by Loss on Drying. Every value on them is
+within limits. SPEC-7 §3.2 and §4 are explicit that such a result cannot release a lot and the lot goes
+to Quality — so we hold. But the ledger "penalises holding something you did not need to," and if its
+answer key treats those as acceptable — because the numbers are fine — we lose points for following the
+client's own specification.
+
+The same applies to the three unapproved suppliers, whose certificates are otherwise flawless.
+
+**We are following SPEC-7.** If that costs ledger points, it costs ledger points. Optimising against a
+scoring instrument we cannot see, in preference to a controlled quality document we can, would be the
+clearest possible case of doing something that was not ours to do — and it is the exact failure the
+engagement warns about. This is recorded here so the choice is visible and can be argued with, rather
+than discovered in the score.
+
+### Two mistakes of ours, found by this sweep
+
+**M1. We gitignored a required deliverable.** `/decisions.jsonl` was added to `.gitignore` on the
+reasoning that it is derived output. It is also deliverable #5, and the engagement asks for three runs of
+it. Fixed: the ignore is scoped to scratch runs at the repo root, and submitted runs live in
+`submissions/` and are tracked.
+
+**M2. Our domain model does not match the documents.** Two defects, both found by reading the corpus
+against the code we had already written:
+- `Certificate.stated_conformance` is a single document-level flag. In the actual documents, PASS is
+  stated **per attribute** (COA-0007, 0013, 0029, 0034 and others). SPEC-7 §5 turns on a per-result
+  contradiction, so the flag was in the wrong place and could not express the rule it exists for.
+- `Measurement` has no room for the original value and unit, so SPEC-7 §2's "the conversion shall be
+  recorded" could not be satisfied by the model we had.
+
+Both are fixed before the rules are wired. They are the kind of defect that only appears when you stop
+designing and start reading the data, which is an argument for doing that earlier.
