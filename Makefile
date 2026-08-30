@@ -59,7 +59,7 @@ check: ## The whole ritual: hygiene (gitleaks/format) + size guard + lint + test
 PLACEHOLDER_PATHS ?= README.md CLAUDE.md STATUS.md docs/overview.md REPO-SURFACE.yaml $(wildcard pyproject.toml package.json)
 
 placeholders: ## Report template text still unfilled in the canonical files (STRICT=1 to fail on it)
-	@hits=$$(grep -nEH '\[repo name\]|\[Repository Name\]|\[repo_kind\]|\[list\]|\[add as you grow|\[add yours as you hit them\]|\[the single canonical path\]|\[the ones set true\]|One-line description of what this repo does|\[Describe what this repository does|Replace me|^# Pack: |<upcoming milestone|<risk or blocker>|<one-line rationale>' $(PLACEHOLDER_PATHS) 2>/dev/null || true); \
+	@hits=$$(grep -nEH '\[repo name\]|\[Repository Name\]|\[fill:|\[repo_kind\]|\[list\]|\[add as you grow|\[add yours as you hit them\]|\[the single canonical path\]|\[the ones set true\]|One-line description of what this repo does|\[Describe what this repository does|Replace me|^# Pack: |<upcoming milestone|<risk or blocker>|<one-line rationale>' $(PLACEHOLDER_PATHS) 2>/dev/null || true); \
 	if [ -z "$$hits" ]; then echo "✓ no template placeholders left"; \
 	elif [ -n "$(STRICT)" ]; then echo "✗ template placeholders still unfilled:"; echo "$$hits"; exit 1; \
 	else echo "↪ template placeholders still unfilled (warning — 'make placeholders STRICT=1' to fail on these):"; echo "$$hits"; fi

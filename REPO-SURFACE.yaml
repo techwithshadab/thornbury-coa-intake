@@ -12,8 +12,8 @@ surfaces:
   user_facing           : false # exposed to external callers (→ authz default-deny, injection defense, backward-compat)
   has_consumers         : true  # other code/teams depend on its contract (→ backward-compat contract, deprecation)
   handles_pii           : false # processes personal data (→ PII-in-logs redaction, retention)
-  handles_secrets       : true  # holds/uses credentials at runtime (→ secrets from a manager, not plaintext)
-  external_network      : true  # makes caller-influenced outbound calls (→ anti-SSRF allowlist, timeouts)
+  handles_secrets       : false # FLIPS TRUE when an LLM extractor lands (an API key). Nothing uses a credential today.
+  external_network      : false # FLIPS TRUE with the same change. No outbound call exists today.
   decisioning_or_scoring: true  # derives/ranks/matches/decides (→ externalized policy, provenance, explanation, abstain)
   data_measurement      : true  # carries measured/analytics values (→ {value,unit,source}, canonicalize-on-write, schema-on-read)
   generated_code        : true  # commits generated artifacts (→ regenerate-clean-diff freshness)
@@ -25,4 +25,22 @@ surfaces:
 #  - where config/truth lives + the one config boundary
 #  - the external boundaries: inputs, outputs, APIs, events, files, secrets, network, persisted state
 notes: |
-  [fill: what this repo does, its entry point, its config boundary, and its external boundaries]
+  Reads supplier Certificates of Analysis and decides, against SPEC-7 rev D, whether a lot is
+  accepted into the ERP or held for a human. The judgement is the product; the data entry is the
+  volume. Thornbury's asymmetry governs the design: a wrong accept is a recall conversation, a
+  wrong hold is a day of delay.
+
+  One concern, one entry point: `coa-intake` -> cli.main -> cli.run -> app.decide.
+  Config/truth: reviewed reference data in reference/, DERIVED by tools/derive_reference.py from
+  the controlled sources vendored in reference/source/. The one config boundary is paths.py, the
+  sole reader of the environment.
+
+  External boundaries. Inputs: a documents directory and a reference directory, both runtime
+  arguments -- never constants, because this runs against documents it has not seen. Outputs:
+  decisions.jsonl, one line per document, carrying schema_version. Contracts consumed: SPEC-7 rev D
+  section 2 and the ERP supplier master. Persisted state: none. Secrets: none today. Network: none
+  today -- both flip when an LLM extractor lands, and that change also raises the question, not yet
+  asked, of whether certificate text may leave Thornbury's boundary.
+
+  deployed and stateful are false and EXPECTED TO BECOME TRUE. Their obligations are the go-live
+  backlog in STATUS.md, not silently-passed lines.

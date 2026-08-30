@@ -20,8 +20,9 @@ and the checks are in place and green. `app.decide()` returns `hold` for every d
 
 ## The shape
 - **Repo kind / surfaces:** `rules-engine`, `criticality: regulated`. True: `has_consumers`,
-  `handles_secrets`, `external_network`, `decisioning_or_scoring`, `data_measurement`, `generated_code`,
-  `stores_or_shows_time`.
+  `decisioning_or_scoring`, `data_measurement`, `generated_code`, `stores_or_shows_time`.
+  `handles_secrets`, `external_network`, `deployed` and `stateful` are false today and named in
+  `REPO-SURFACE.yaml` with the change that flips each one.
 - **One concern / entry point:** `coa-intake` → `cli.main` → `cli.run` → `app.decide`.
 - **Where config/truth lives:** reviewed reference data in `reference/`, derived by
   `tools/derive_reference.py` from `reference/source/`. The one config boundary is `paths.py`.

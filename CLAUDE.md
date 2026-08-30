@@ -5,12 +5,16 @@
 
 ## Surfaces
 Declared in `REPO-SURFACE.yaml`: `repo_kind: rules-engine`, `criticality: regulated`. True surfaces:
-`has_consumers`, `handles_secrets`, `external_network`, `decisioning_or_scoring`, `data_measurement`,
-`generated_code`, `stores_or_shows_time`. The universal-core invariants below always apply; each surface
-adds its own section.
+`has_consumers`, `decisioning_or_scoring`, `data_measurement`, `generated_code`, `stores_or_shows_time`.
+The universal-core invariants below always apply; each true surface adds its own section.
 
-`deployed` and `stateful` are **false today and expected to become true** — the working slice is a batch
-CLI. Their obligations are the go-live backlog in `STATUS.md`, not silently-passed lines.
+Four surfaces are **false today and expected to become true**, and are declared false rather than
+aspirationally true so the bar does not fill with N/A findings:
+- `handles_secrets` and `external_network` flip when an LLM extractor lands (an API key, an outbound
+  call, and the unasked question of whether certificate text may leave Thornbury's boundary).
+- `deployed` and `stateful` flip when this stops being a batch CLI.
+
+Their obligations are the go-live backlog in `STATUS.md`, not silently-passed lines.
 
 ## Storage model
 - Config/truth lives in reviewed files in-repo under `reference/`, **derived** by
