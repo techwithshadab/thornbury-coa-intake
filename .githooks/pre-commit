@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# Engine git rails — commit-time checks.
+#
+# BLOCKS (unrecoverable, or lands on other people):
+#   - a file over the size ceiling      (poisons history; needs filter-repo to undo once pushed)
+#   - conflict markers                  (silently ships broken files)
+#   - an obvious private key            (belt to gitleaks' braces in .pre-commit-config.yaml)
+#
+# WARNS (recoverable by the person who did it, so it teaches instead of stopping):
+#   - committing straight onto a protected branch
+#   - committing on a detached HEAD
+#   - committing with an unset or personal git identity
+#   - committing a file the standard .gitignore would normally have caught
+#
+# The split is deliberate. See RECOVERY.md and lib.sh.
+
+set -uo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+. "$DIR/lib.sh"
+
+STAGED="$(git diff --cached --name-only --diff-filter=ACM)"
+[ -z "$STAGED" ] && exit 0
+
+FAIL=0
+
+# --- BLOCK: oversized files -------------------------------------------------
+LIMIT=$(( RAILS_MAXBLOBMB * 1024 * 1024 ))
+while IFS= read -r f; do
+    [ -f "$f" ] || continue
+    sz=$(git cat-file -s ":$f" 2>/dev/null || echo 0)
+    if [ "$sz" -gt "$LIMIT" ]; then
+        die "$f is $(human_size "$sz") — over the ${RAILS_MAXBLOBMB} MB ceiling." \
+            "Large files are permanent. Once this is pushed, removing it needs a history rewrite that breaks every clone." \
+            "git restore --staged '$f'      # unstage it, keep the file" \
+            "Then put it in external storage and reference it, or add it to .gitignore." \
+            "If it genuinely belongs in git, raise the ceiling deliberately:" \
+            "  git config rails.maxblobmb <n>   # and say why in decisions/" && FAIL=1
+    fi
+done <<< "$STAGED"
+
+# --- BLOCK: conflict markers ------------------------------------------------
+while IFS= read -r f; do
+    # RECOVERY.md documents what conflict markers look like, so it contains them on purpose.
+    case "$f" in RECOVERY.md|*/RECOVERY.md) continue ;; esac
+    if git show ":$f" 2>/dev/null | grep -qE '^(<{7}|={7}|>{7})( |$)'; then
+        die "$f still has merge conflict markers." \
+            "This commits a file that is not valid in any language, and the break usually surfaces far from here." \
+            "Open '$f' and resolve the <<<<<<< / ======= / >>>>>>> sections." \
+            "git add '$f'   # once it is actually resolved" && FAIL=1
+    fi
+done <<< "$STAGED"
+
+# --- BLOCK: private keys ----------------------------------------------------
+while IFS= read -r f; do
+    if git show ":$f" 2>/dev/null | grep -q -- '-----BEGIN [A-Z ]*PRIVATE KEY-----'; then
+        die "$f contains a private key." \
+            "A key in git history is compromised even after deletion — anyone with a clone has it forever." \
+            "git restore --staged '$f'" \
+            "Move the key outside the repo, add its path to .gitignore, and rotate it if it ever reached a remote." && FAIL=1
+    fi
+done <<< "$STAGED"
+
+[ "$FAIL" -ne 0 ] && [ "$RAILS_ENFORCE" != "warn-only" ] && exit 1
+
+# --- WARN: protected branch -------------------------------------------------
+BRANCH="$(current_branch)"
+if [ "$BRANCH" = "HEAD" ]; then
+    warn "You are on a detached HEAD — this commit belongs to no branch." \
+         "It will not appear on any branch and is easy to lose entirely." \
+         "Keep it by giving it a branch right after committing:" \
+         "  git branch my-work && git checkout my-work"
+elif [ "$RAILS_BRANCHFLOW" = "on" ] && is_protected "$BRANCH"; then
+    warn "Committing straight onto '$BRANCH', a protected branch." \
+         "The engine's review seam assumes work arrives by branch — no artifact, no review." \
+         "Move this commit onto a branch instead (nothing is lost):" \
+         "  git branch my-work && git reset --keep HEAD~1 && git checkout my-work"
+fi
+
+# --- WARN: identity ---------------------------------------------------------
+EMAIL="$(git config user.email || true)"
+NAME="$(git config user.name || true)"
+if [ -z "$EMAIL" ] || [ -z "$NAME" ]; then
+    warn "git identity is not set for this repo — the commit will be attributed to nobody useful." \
+         "git config user.name  'Your Name'" \
+         "git config user.email 'you@themathcompany.com'"
+else
+    EXPECT="$(rails_cfg rails.emaildomain '')"
+    if [ -n "$EXPECT" ] && [[ "$EMAIL" != *"@$EXPECT" ]]; then
+        warn "Committing as <$EMAIL>, which is not @$EXPECT." \
+             "Client repos with mixed personal and work attribution are a real handover problem." \
+             "If that is wrong, fix it and amend:" \
+             "  git config user.email 'you@$EXPECT' && git commit --amend --reset-author --no-edit"
+    fi
+fi
+
+# --- WARN: files that normally belong in .gitignore -------------------------
+JUNK="$(printf '%s\n' "$STAGED" | grep -iE '(^|/)(\.DS_Store|Thumbs\.db|node_modules/|\.venv/|venv/|__pycache__/)|\.(csv|tsv|xlsx|xls|parquet|pkl|pickle|h5|sqlite3?|log)$' || true)"
+if [ -n "$JUNK" ]; then
+    warn "Staging files the standard .gitignore would normally exclude:" \
+         "$(printf '%s' "$JUNK" | head -5 | tr '\n' ' ')" \
+         "Data and generated files bloat the repo permanently and rarely belong in git." \
+         "  git restore --staged <file>     # to drop one" \
+         "If this was 'git add .', check 'git status' before committing next time."
+fi
+
+exit 0

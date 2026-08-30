@@ -1,0 +1,53 @@
+# ============================================================
+# MathCo Standard .gitattributes
+#
+# Mostly here to stop line endings from turning every file in a diff red the
+# first time a Windows machine touches the repo. Cheap to ship, expensive to
+# retrofit once the noise is already in history.
+# ============================================================
+
+# Normalise to LF in the repository; check out native on Windows.
+* text=auto
+
+# Always LF — these break when given CRLF.
+*.sh            text eol=lf
+*.bash          text eol=lf
+Makefile        text eol=lf
+.githooks/*     text eol=lf
+
+# Always CRLF — these expect it.
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+
+# Binary: never diff, never line-ending-convert.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.xlsx binary
+*.xls binary
+*.docx binary
+*.pptx binary
+*.parquet binary
+*.pkl binary
+*.joblib binary
+*.onnx binary
+*.pt binary
+*.pth binary
+
+# Lockfiles: real content, but reviewing their diff is never useful.
+package-lock.json  -diff linguist-generated
+pnpm-lock.yaml     -diff linguist-generated
+yarn.lock          -diff linguist-generated
+bun.lock           -diff linguist-generated
+uv.lock            -diff linguist-generated
+poetry.lock        -diff linguist-generated
+
+# Notebooks diff as unreadable JSON. If this repo works in notebooks, strip
+# outputs before commit (nbstripout) rather than committing rendered results —
+# outputs carry data, sometimes client data, into git permanently.
+*.ipynb  -diff

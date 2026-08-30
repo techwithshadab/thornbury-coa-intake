@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Engine git rails — detached HEAD warning. Never blocks (a post hook cannot).
+#
+# Detached HEAD is the single most confusing state git puts a newcomer in:
+# everything appears to work, commits succeed, and then the work is invisible
+# and apparently gone. Naming it at the moment it happens is most of the cure.
+
+set -uo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+. "$DIR/lib.sh"
+
+# args: <prev HEAD> <new HEAD> <1 if branch checkout, 0 if file checkout>
+[ "${3:-0}" = "1" ] || exit 0
+
+if ! git symbolic-ref -q HEAD >/dev/null 2>&1; then
+    warn "You are now on a DETACHED HEAD at $(git rev-parse --short HEAD)." \
+         "Commits made here belong to no branch. Switching away appears to delete them." \
+         "If you meant to look around, nothing to do — just don't commit." \
+         "If you meant to work here, give it a branch first:" \
+         "  git switch -c my-work"
+fi
+
+exit 0

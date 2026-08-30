@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# Engine git rails — the safe-command dispatcher behind the aliases.
+#
+# The point of this layer: hooks can only refuse things, and the git commands
+# that destroy the most work (reset --hard, checkout ., clean -fd, stash drop)
+# have no hook at all. The only way to reduce those is to make a safe command
+# shorter to type than the dangerous one. That is the axiom, applied to git.
+#
+#   git sync     replaces  git pull            — never leaves you mid-rebase by surprise
+#   git panic    replaces  hoping              — snapshot everything, change nothing
+#   git undo     replaces  git reset --hard    — undoes the commit, keeps the work
+#   git oops     replaces  panic               — find and recover apparently-lost work
+#   git nb       replaces  git checkout -b     — branches from a fresh base, not a stale one
+#   git where    replaces  guessing            — one screen of orientation
+#   git rescues  lists what panic saved
+#
+# Installed by install-rails.sh via .githooks/aliases.gitconfig.
+
+set -uo pipefail
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "not a git repo" >&2; exit 1; }
+# shellcheck source=../lib.sh
+. "$ROOT/.githooks/lib.sh"
+
+BRANCH="$(current_branch)"
+
+base_branch() {
+    git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||' \
+        || printf 'main'
+}
+
+cmd_sync() {
+    if [ "$BRANCH" = "HEAD" ]; then
+        warn "Detached HEAD — nothing to sync." "Give this state a branch first:  git switch -c my-work"
+        return 0
+    fi
+    info "fetching origin..."
+    git fetch --quiet --prune origin || { warn "Could not reach origin." "Check the network, then try again."; return 1; }
+
+    local up; up="$(git rev-parse --verify --quiet "origin/$BRANCH")"
+    if [ -z "$up" ]; then
+        info "No origin/$BRANCH yet — this branch has never been pushed."
+        info "Publish it with:  git push -u origin $BRANCH"
+        return 0
+    fi
+
+    local ahead behind
+    behind="$(git rev-list --count "HEAD..origin/$BRANCH")"
+    ahead="$(git rev-list --count "origin/$BRANCH..HEAD")"
+
+    if [ "$behind" -eq 0 ] && [ "$ahead" -eq 0 ]; then
+        info "Up to date with origin/$BRANCH."
+    elif [ "$behind" -gt 0 ] && [ "$ahead" -eq 0 ]; then
+        info "$behind new commit(s) from origin. Fast-forwarding (safe — you have nothing local to lose):"
+        git log --oneline "HEAD..origin/$BRANCH" | head -10
+        git merge --ff-only "origin/$BRANCH" || warn "Fast-forward failed." "You may have uncommitted changes. Commit or 'git panic' first."
+    elif [ "$behind" -eq 0 ]; then
+        info "$ahead local commit(s) not yet on origin. Nothing to pull."
+        info "Publish with:  git push"
+    else
+        warn "Diverged: $ahead local commit(s), $behind on origin." \
+             "This is the situation people force-push their way out of and lose work. Do not." \
+             "Snapshot first, then replay your work on top of theirs:" \
+             "  git panic                       # nothing can be lost after this" \
+             "  git pull --rebase origin $BRANCH" \
+             "If the rebase turns messy:  git rebase --abort   (puts everything back)"
+    fi
+}
+
+cmd_panic() {
+    local ts ref
+    ts="$(date +%Y%m%d-%H%M%S)"
+    ref="refs/rails/panic/$ts"
+
+    if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+        info "Working tree is clean — nothing to snapshot."
+        info "Your commits are already safe; 'git oops' finds them if a branch moves."
+        return 0
+    fi
+
+    git stash push --include-untracked --quiet --message "rails-panic $ts" || {
+        warn "Could not snapshot." "Run 'git status' and try committing instead."; return 1; }
+    local sha; sha="$(git rev-parse stash@{0})"
+    git update-ref "$ref" "$sha"
+    # Put the working tree back exactly as it was — panic must change nothing.
+    git stash apply --quiet stash@{0} 2>/dev/null || warn "Snapshot saved, but restoring the tree hit a snag." "Recover with:  git stash apply stash@{0}"
+
+    info "Snapshot saved. Your working tree is unchanged."
+    info "  ref:     $ref"
+    info "  restore: git stash apply $sha"
+    info "  list:    git rescues"
+}
+
+cmd_rescues() {
+    local found=0
+    for r in $(git for-each-ref --format='%(refname)' refs/rails/panic 2>/dev/null | sort -r); do
+        found=1
+        printf '%s  %s\n' "${r#refs/rails/panic/}" "$(git log -1 --format='%s' "$r" 2>/dev/null)"
+    done
+    [ "$found" -eq 0 ] && info "No panic snapshots in this repo."
+    [ "$found" -eq 1 ] && info "Restore any of them with:  git stash apply refs/rails/panic/<id>"
+    return 0
+}
+
+cmd_undo() {
+    if ! git rev-parse --verify --quiet HEAD~1 >/dev/null; then
+        warn "This is the first commit — there is nothing behind it to undo." \
+             "To unstage everything but keep the files:  git reset"
+        return 1
+    fi
+    local subject pushed
+    subject="$(git log -1 --format='%s')"
+    pushed=""
+    if git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null &&
+       git merge-base --is-ancestor HEAD "origin/$BRANCH" 2>/dev/null; then
+        pushed="yes"
+    fi
+    if [ -n "$pushed" ]; then
+        warn "That commit is already on origin/$BRANCH." \
+             "Undoing it locally puts you out of step with the remote, and pushing the result means rewriting shared history." \
+             "Prefer a new commit that reverses it — safe, and it keeps the record honest:" \
+             "  git revert HEAD"
+        return 1
+    fi
+    git reset --soft HEAD~1
+    info "Undid commit: $subject"
+    info "Every change from it is still here and still staged — nothing was lost."
+    info "  keep editing, then:  git commit"
+    info "  or unstage:          git reset"
+}
+
+cmd_oops() {
+    info "Where HEAD has been recently (newest first):"
+    git reflog --date=relative --format='  %C(auto)%h%C(reset)  %gd  %gs  %C(dim)(%cd)%C(reset)' -20
+    printf '\n' >&2
+    info "Nothing in that list is gone. To get back to any line:"
+    info "  git switch -c recovered <hash>     # safest — puts it on a new branch"
+    printf '\n' >&2
+    info "Lost uncommitted work instead? Check snapshots:  git rescues"
+    info "Lost a whole commit that is not in the list?     git fsck --lost-found"
+}
+
+cmd_nb() {
+    local name="${1:-}" base; base="$(base_branch)"
+    [ -z "$name" ] && { echo "usage: git nb <branch-name>" >&2; return 1; }
+    info "fetching origin so the new branch starts from current $base..."
+    git fetch --quiet origin "$base" 2>/dev/null || warn "Could not fetch." "Branching from your local $base, which may be stale."
+    local start; start="$(git rev-parse --verify --quiet FETCH_HEAD || git rev-parse --verify "$base")"
+    git switch -c "$name" "$start" || return 1
+    info "On '$name', started from current $base. Publish it when ready:  git push -u origin $name"
+}
+
+cmd_where() {
+    printf '%s\n' "${_B}repo${_0}     $(basename "$ROOT")"
+    local tag=''
+    if is_protected "$BRANCH"; then
+        # Only nag about branch flow where the repo actually wants branch flow;
+        # otherwise "protected" here just means force-push protected.
+        [ "$RAILS_BRANCHFLOW" = "on" ] \
+            && tag="   ${_Y}(protected — work on a branch instead)${_0}" \
+            || tag="   ${_C}(protected from force-push)${_0}"
+    fi
+    printf '%s\n' "${_B}branch${_0}   ${BRANCH}${tag}"
+    printf '%s\n' "${_B}identity${_0} $(git config user.name || echo 'UNSET') <$(git config user.email || echo 'UNSET')>"
+    local dirty; dirty="$(git status --porcelain | wc -l | tr -d ' ')"
+    printf '%s\n' "${_B}changes${_0}  ${dirty} uncommitted file(s)"
+    if git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null; then
+        printf '%s\n' "${_B}vs origin${_0} $(git rev-list --count "origin/$BRANCH..HEAD") ahead, $(git rev-list --count "HEAD..origin/$BRANCH") behind   ${_C}(git sync)${_0}"
+    else
+        printf '%s\n' "${_B}vs origin${_0} never pushed   ${_C}(git push -u origin $BRANCH)${_0}"
+    fi
+    printf '%s\n' "${_B}remotes${_0}  $(git remote | tr '\n' ' ')"
+}
+
+case "${1:-}" in
+    sync)    shift; cmd_sync "$@" ;;
+    panic)   shift; cmd_panic "$@" ;;
+    rescues) shift; cmd_rescues "$@" ;;
+    undo)    shift; cmd_undo "$@" ;;
+    oops)    shift; cmd_oops "$@" ;;
+    nb)      shift; cmd_nb "$@" ;;
+    where)   shift; cmd_where "$@" ;;
+    *) echo "rails: unknown command '${1:-}' (sync|panic|rescues|undo|oops|nb|where)" >&2; exit 2 ;;
+esac

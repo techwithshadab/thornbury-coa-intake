@@ -1,0 +1,245 @@
+# ============================================================
+# MathCo Standard .gitignore
+# Covers: secrets, Python, Node, common data files, models,
+#         logs, IDE/editor, OS-level noise.
+#
+# This file ships as `.gitignore` in the scaffold — no rename needed.
+# Customize only the "Project-specific" section at the bottom;
+# DO NOT remove anything under "Secrets and credentials".
+#
+# Why this matters: missing .gitignore entries are how repos
+# accumulate gigabytes of data files, leaked secrets, and
+# committed virtual environments. Every pattern below exists
+# because someone, somewhere, didn't have it.
+# ============================================================
+
+
+# ============================================================
+# Secrets and credentials — CRITICAL, never commit
+# ============================================================
+.env
+.env.*
+*.env
+temp.env
+local.env
+*.cer
+*.crt
+*.key
+*.pem
+*.pfx
+*.p12
+secrets/
+credentials/
+config/secrets/
+**/cred/
+**/certs/
+
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+.installed.cfg
+MANIFEST
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Type checkers / linters
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+*.ipynb_meta
+profile_default/
+ipython_config.py
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env-*/
+ENV/
+env.bak/
+venv.bak/
+virtualenvs/
+pip-log.txt
+pip-delete-this-directory.txt
+
+
+# ============================================================
+# Node / TypeScript
+# ============================================================
+node_modules/
+jspm_packages/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.npm
+.yarn-integrity
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.turbo/
+
+# Optional eslint / stylelint
+.eslintcache
+.stylelintcache
+
+
+# ============================================================
+# Large data files — use external storage, not git
+# ============================================================
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.db
+*.sqlite
+*.sqlite3
+*.arrow
+# NOTE on the data directories: these are `/*` forms, NOT bare `Data/` / `data/`, and the
+# difference is load-bearing. Git does not descend into an EXCLUDED DIRECTORY, so under a
+# bare `data/` rule a later `!data/sample-batch/` negation is silently INERT — you cannot
+# re-include a repo's own reviewed input, and `git add -A` stages nothing while `git status`
+# stays clean. (On a case-insensitive filesystem — macOS default — `Data/` matches `data/`
+# too, so fixing only the lowercase line leaves the negation just as inert. `git check-ignore
+# -v <path>` is the only thing that tells you which rule won.)
+#
+# This cost a real repo its entire input corpus: 36 reviewed documents untracked, every local
+# check green for two days, and the failure only visible when someone cloned it somewhere else.
+#
+# To keep reviewed input that lives under data/, re-include it explicitly:
+#     !data/sample-batch/
+#
+# Tradeoff, stated: `/*` anchors these to the repo root, so a NESTED `src/foo/data/` is no
+# longer ignored by name. The extension rules above (*.csv, *.parquet, …) and the `make size`
+# guard still catch the actual bloat risk, which is large FILES rather than the directory name.
+/Data/*
+/data/*
+/datasets/*
+fabric/
+warehouses/
+raw/
+processed/
+
+
+# ============================================================
+# Binary models and large artifacts
+# ============================================================
+*.pkl
+*.pickle
+*.joblib
+*.bin
+*.onnx
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.tflite
+*.mlmodel
+models/
+checkpoints/
+weights/
+# NOTE: `artifacts/` is deliberately NOT ignored here. In the engine it is a
+# first-class word — the documents and assets an engagement produces — and
+# ignoring it makes committed deliverables vanish with no error shown. If this
+# repo also writes large BINARY build output, ignore that path by name instead
+# (e.g. `build-artifacts/`, `target/`).
+
+
+# ============================================================
+# Logs
+# ============================================================
+*.log
+logs/
+log/
+*.log.*
+
+
+# ============================================================
+# IDE / editor
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+.project
+.classpath
+.settings/
+*.sublime-*
+.history/
+
+
+# ============================================================
+# Operating system
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+
+# ============================================================
+# Local config and overrides
+# ============================================================
+local_settings.py
+*.local
+.local/
+
+
+# ============================================================
+# Project-specific (add your repo's patterns below this line)
+# ============================================================
+
+# --- This repo's own output ---------------------------------------------------------------------
+# decisions.jsonl is DERIVED from a documents directory that is a runtime input. Committing one
+# would make a snapshot of a particular run look like a reviewed artifact of the repo.
+/decisions.jsonl
