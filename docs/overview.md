@@ -65,6 +65,8 @@ tests/            the suite, incl. the invariant tests
 docs/
   overview.md         this file
   open-questions.md   what is NOT ours to decide, by owner, + the assumptions we run on
+  working-answers.md  the provisional ruling on each, and what it costs if wrong
+  questions-to-send.md  those questions drafted as notes, one per stakeholder
   reference/          how each part works TODAY
 decisions/        append-only ADRs
 reviews/          gate records
@@ -73,7 +75,9 @@ REPO-SURFACE.yaml what this repo is (the router for the repo-fitness bar)
 
 ## Doc map
 - **What we could not decide alone → [`docs/open-questions.md`](open-questions.md)** — 21 questions
-  routed to their owner with the evidence behind each, 10 stated assumptions, and one we refuse to make
+  routed to their owner with the evidence behind each, and 10 stated assumptions
+- **What we are building on meanwhile → [`docs/working-answers.md`](working-answers.md)** — a
+  provisional, reversible ruling per question, with the business consequence of each
 - Those questions drafted as sendable notes → [`docs/questions-to-send.md`](questions-to-send.md)
 - Engineering contract & invariants → `CLAUDE.md`
 - Repo standards & branch protection → `CONVENTIONS.md`

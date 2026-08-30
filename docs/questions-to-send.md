@@ -69,10 +69,13 @@ twelve years of knowing who sends clean paperwork. If any of these calls actuall
 order, the previous lot or the goods-in record, I'd rather know now — I'd be building something
 structurally unable to make that call.
 
-**The observation.** Roughly a third of the 36 have something in them that needs a person — two report a
-result outside specification and still say PASS, three use loss-on-drying for moisture, three are from
-suppliers not on the approved list you sent, two have no retest date, two have the lot mismatch above.
-That's much higher than the handful a month you described.
+**The observation.** Exactly half of the 36 — 18 documents — have something in them that isn't routine.
+Two report a result outside specification and still say PASS. Three use loss-on-drying for moisture,
+which SPEC-7 says can't release a lot. Three are from suppliers not on the approved list you sent us.
+Two have no retest date. Two have the lot mismatch above. Four have a date that reads two ways. Two
+report heavy metals in ppb against a limit written in ppm.
+
+That is a long way from a handful a month.
 
 I don't want to read too much into it. It could easily be that this batch was picked to be interesting.
 But if it's just a normal week, that's worth knowing, and it's a bigger finding than the data entry. Do

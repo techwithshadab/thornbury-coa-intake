@@ -13,3 +13,4 @@ Append-only record of decisions, scope/priority changes, commitments, and deviat
 |------|------|---------|--------------|-----|
 | YYYY-MM-DD | decision | <what was decided, and why, in one line> | <role> | ADR-NNNN / PR# / ticket |
 | 2026-08-29 | decision | stood the repo up on the repo-fitness bar: rules-engine surfaces declared, decisioning pack installed, derived reference data + freshness/correctness gates, owned command wired to uv | solutioner-of-record | ADR-0002 |
+| 2026-08-30 | decision | provisional rulings on all 21 open questions; ADR-0004/0005/0006; corrected the sample anomaly count from 12/36 to 18/36 | solutioner-of-record | ADR-0004 |
