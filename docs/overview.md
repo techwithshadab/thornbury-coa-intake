@@ -74,6 +74,7 @@ REPO-SURFACE.yaml what this repo is (the router for the repo-fitness bar)
 ## Doc map
 - **What we could not decide alone → [`docs/open-questions.md`](open-questions.md)** — 21 questions
   routed to their owner with the evidence behind each, 10 stated assumptions, and one we refuse to make
+- Those questions drafted as sendable notes → [`docs/questions-to-send.md`](questions-to-send.md)
 - Engineering contract & invariants → `CLAUDE.md`
 - Repo standards & branch protection → `CONVENTIONS.md`
 - How-it-works-today → `docs/reference/`

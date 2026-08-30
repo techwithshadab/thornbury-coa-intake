@@ -7,6 +7,9 @@
 > assumption is stated in Part 2 with what breaks if it is wrong.
 >
 > Status: **none of these has an owner or a date.** That is the single largest risk on this engagement.
+>
+> Drafted as notes you can actually send — five, one per stakeholder, with the sending order and what is
+> blocked on what — in **[`questions-to-send.md`](questions-to-send.md)**.
 
 ---
 
