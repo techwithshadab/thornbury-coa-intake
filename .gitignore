@@ -240,6 +240,8 @@ local_settings.py
 # ============================================================
 
 # --- This repo's own output ---------------------------------------------------------------------
-# decisions.jsonl is DERIVED from a documents directory that is a runtime input. Committing one
-# would make a snapshot of a particular run look like a reviewed artifact of the repo.
+# A scratch run at the repo root is derived output and stays out of git. A SUBMITTED run is a
+# deliverable and lives in submissions/, tracked — an earlier version of this file ignored both,
+# which would have left deliverable #5 out of the repo entirely.
 /decisions.jsonl
+!/submissions/

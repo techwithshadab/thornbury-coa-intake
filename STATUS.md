@@ -38,6 +38,22 @@ not code. In order:
   asserted — and `CLAUDE.md` names this as an invariant that does not yet hold. **Every projected number
   in `working-answers.md` is arithmetic over 36 documents, not a measurement.**
 
+## Deliverables — where we actually stand
+The engagement asks for six things. A pre-build sweep on 2026-08-30 found **three missing entirely**,
+which was a bigger gap than anything technical it turned up.
+
+| # | Deliverable | State |
+|---|---|---|
+| 1 | A working slice | **partial** — frame green, rules wired 2026-08-30 |
+| 2 | A deployment plan that actually works | **missing** — fragments only (R16, ERP API off the critical path) |
+| 3 | Decision records | **done** — ADR-0001…0007 |
+| 4 | A handover package | **partial** — repo docs exist, no assembled package |
+| 5 | `decisions.jsonl` | **produced**; was gitignored (M1) — fixed, submitted runs tracked in `submissions/` |
+| 6 | A working log — how AI was used, incl. what it got wrong | **missing** |
+
+Deliverable 6 has at least two entries waiting: the sample anomaly count stated as 12/36 when it is
+18/36, and the two domain-model defects (M2) that came from designing before reading the corpus.
+
 ## Not built, deliberately — with the reason
 - **OCR.** Out of scope per the engagement brief. The seam is `extraction.Extractor`; the one
   implementation reads pre-extracted text. What productionalising it takes is written up in

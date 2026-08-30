@@ -12,10 +12,12 @@ import json
 import pathlib
 
 from .domain import Spec, compile_spec
-from .raw import RawSpec, RawSupplierMaster
+from .policy import Policy, compile_policy
+from .raw import RawPolicy, RawSpec, RawSupplierMaster
 
 SPEC_FILE = "spec-7.json"
 SUPPLIER_FILE = "supplier-master.json"
+POLICY_FILE = "policy.json"
 
 
 def _load_json(path: pathlib.Path) -> dict:
@@ -37,3 +39,9 @@ def load_supplier_master(reference_root: pathlib.Path) -> frozenset[str]:
     certificates; the ERP holds them as registered."""
     raw = RawSupplierMaster.model_validate(_load_json(reference_root / SUPPLIER_FILE))
     return frozenset(name.casefold() for name in raw.suppliers)
+
+
+def load_policy(reference_root: pathlib.Path) -> Policy:
+    """Validate then compile the provisional rulings. Hand-authored, unlike the two above — and
+    validated all the same: a policy that silently dropped a rule would turn a hold into an accept."""
+    return compile_policy(RawPolicy.model_validate(_load_json(reference_root / POLICY_FILE)))
