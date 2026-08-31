@@ -1,36 +1,28 @@
 # Access inventory — what this needs, and who grants it
 
-<!--
-  A HANDOVER HOME (exit-package gate row 5.2). Ships empty; fill it as you build.
+**Today: nothing.** This repo needs no account, credential, network egress or licence to run. That is
+worth recording rather than leaving blank — the reason the inventory is empty is a design choice
+(ADR-0007: deterministic parsing, no model, no outbound call), not an omission.
 
-  WHY THIS EXISTS. The single most common handover failure is not code the receiver
-  can't read — it is a credential, a role, or an allowlist entry that only the departing
-  team had. Every dependency below is something that can silently expire, be revoked,
-  or be scoped to a person who is leaving. Name it while you still have it.
+`REPO-SURFACE.yaml` declares `handles_secrets` and `external_network` **false**, honestly.
 
-  ⚠️ NEVER PUT A SECRET IN THIS FILE. This is a committed artifact. Record WHERE a
-  credential lives (the vault path, the secret name) and WHO grants it — never the value.
-  A secret pasted here is a secret in git history forever.
--->
+## What a new joiner needs on day one
 
-**Engagement:** `<slug>`  ·  **Maintained by:** the delivery lead  ·  **Updated:** YYYY-MM-DD
-
-## What the system needs to run
-
-| What | Kind | Where the credential lives | Granted by (role) | Expires | Breaks what if lost |
-|---|---|---|---|---|---|
-| `<system / API / data source>` | `<service account, API key, cert, DB role>` | `<vault path or secret name — NOT the value>` | `<role / team>` | `<date or "n/a">` | `<the concrete failure>` |
-
-## What a human needs to work on this
-
-| Access | Kind | Granted by (role) | Needed for |
-|---|---|---|---|
-| `<repo / environment / dashboard / tracker>` | `<read, write, admin>` | `<role / team>` | `<the task it unblocks>` |
-
-## Owned by the client, not by us
-
-<!-- The accesses that leave with the engagement, or that we never held. The receiver
-     must know which doors we cannot open for them. -->
-
-| Access | Whose | What to do when it's needed |
+| Need | Granted by | Notes |
 |---|---|---|
+| The repo | — | **No remote exists yet.** This is the top handover finding (checklist 2.5); everything lives in one local clone |
+| `git`, `make`, `uv` | Self-install | uv provisions the pinned interpreter; no other runtime needed |
+| The certificate corpus | Thornbury Supply Operations | A runtime input, not part of the repo |
+
+## What later stages will need — and who has not been asked yet
+
+| Need | Stage | Owner | State |
+|---|---|---|---|
+| A host and scheduler for the batch | 2 | Thornbury IT | **Not asked.** Bundled with Q16 |
+| Credentials for the ERP lot-creation endpoint | 3 | Thornbury IT | **Not asked.** `handles_secrets` flips true here; sourced from a secrets manager, never committed, rotation path in `SECURITY.md` |
+| A decision on whether certificate content may leave the network | 4 | Priya + whoever owns security | **Not asked (Q19).** Gates whether a hosted model is even a candidate |
+| Read access to the QA tracker's `note` column | any | Marisol Vega | **Not asked (Q5).** Needed for the eval set |
+| A CI runner with a scoped token | now | Whoever hosts the remote | Workflow exists at `.github/workflows/check.yml`, pinned to commit SHAs, `contents: read` — and has never run |
+
+**The pattern worth noticing:** every row in the second table is blocked on a question nobody has been
+asked. That is the same finding as `open-questions.md`, seen from the access angle.

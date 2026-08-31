@@ -48,6 +48,10 @@ measurement, and there is no labelled set to make it one.
 4. **`docs/working-answers.md`** — why each ruling is what it is, and what it costs if wrong.
 5. **`docs/open-questions.md`** — the 21 things that are not ours to decide, by owner.
 
+Then, when you need them: [`runbook.md`](runbook.md) to operate it, [`glossary.md`](glossary.md) for
+the vocabulary (two of this engagement's hardest questions are vocabulary disputes), and
+[`deployment.md`](deployment.md) for how it reaches production.
+
 ### Where the bodies are buried
 
 - **The parser is deliberately brittle in one direction.** An unrecognised layout yields nothing and
@@ -95,7 +99,7 @@ measurement, and there is no labelled set to make it one.
 | 3.1 | README passes the template check | **Complete** | `make placeholders STRICT=1` clean — after the gate was widened twice to catch markers it had been missing |
 | 3.2 | **Setup tested by someone other than the author** | **FAILING** | Proven in a clean clone, but *by its author on the same machine*. Nobody else has run this. The checklist asks for exactly the thing we cannot self-certify |
 | 3.3 | Deployment notes | **Complete** | `docs/deployment.md` — four stages, blockers named |
-| 3.4 | Runbook | **Partial** | `docs/deployment.md` covers operation; no incident runbook, because nothing is deployed to have incidents |
+| 3.4 | Runbook | **Complete for what exists** | `docs/runbook.md` — run it, check it, the failure table, and when to stop and ask. No monitoring section, because nothing is deployed to monitor |
 | 3.5 | "What's NOT in this repo" filled | **Complete** | `README.md` |
 
 ### 4. Size and history
@@ -113,7 +117,7 @@ measurement, and there is no labelled set to make it one.
 |---|---|---|
 | Secrets not in code | **Complete** | `gitleaks` + `detect-private-key` on every commit; no credential is used at runtime today |
 | Dependency vulnerabilities | **Complete** | `make audit` in `make check`; caught a real CVE (`pytest` PYSEC-2026-1845) on first run |
-| Access inventory | **Partial** | `docs/access-inventory.md` exists from the scaffold and is not filled — no accounts to inventory yet |
+| Access inventory | **Complete** | `docs/access-inventory.md` — nothing is needed today, and every later need is blocked on a question nobody has been asked |
 | SECURITY.md reporting path | **Complete** | `SECURITY.md` |
 | Tests | **Complete** | 62, incl. invariant, negative, and mutation tests. `make check` green with no skips |
 | CI | **Partial — FAILING in substance** | `.github/workflows/check.yml` exists and runs the same `make check`. **It has never run**, because there is no remote, so it is not a required check and has not been observed to pass |
