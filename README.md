@@ -133,12 +133,18 @@ target, and rollback procedure. If the deployment process is non-trivial, the fu
 in /docs/runbook.md and this section just summarizes.
 -->
 
-- **Environments:** _[dev / staging / prod URLs or identifiers]_
-- **CI/CD pipeline:** _[link to pipeline / workflow]_
-- **Deploy command or process:** _[steps or link]_
-- **Rollback procedure:** _[steps or link]_
+- **Environments:** none yet. This is a batch CLI run from a workstation. `deployed` and `stateful`
+  are declared `false` in `REPO-SURFACE.yaml` and become true at stage 2 below.
+- **CI/CD pipeline:** [`.github/workflows/check.yml`](.github/workflows/check.yml) — runs `make check`
+  on every PR. **Not yet a required status check**: there is no remote (finding F3).
+- **Deploy command or process:** `make run DOCS=<dir> OUT=<file>`, then a person reviews and uploads.
+  Stage 1 deliberately does **not** call the ERP — see [`docs/deployment.md`](docs/deployment.md).
+- **Rollback procedure:** stage 1 has nothing to roll back — the output is a file that is reviewed
+  before it reaches any system. From stage 2, rollback is `git revert` of the policy or code change,
+  plus re-running the affected batch. Full detail in the deployment plan.
 
-For full deployment runbook, see [`/docs/runbook.md`](docs/runbook.md).
+**The deployment plan is [`docs/deployment.md`](docs/deployment.md)** — four stages, what each
+proves, what it costs, and the four things that are unknown with how each becomes known.
 
 ---
 
@@ -156,11 +162,23 @@ date, source system, owner).
 
 **Inputs:**
 
-- _[Dataset / table / API]_ — _[schema or link]_ — _[source / owner]_
+- **Certificate documents** — a directory of `.txt` extractions, passed as `--documents`. Owned by
+  Thornbury Supply Operations. A runtime input, never a path inside the program: this pipeline is run
+  against documents it has not seen.
+- **Reviewed reference data** — `reference/`, passed as `--reference`.
+  - `spec-7.json`, `supplier-master.json` — **derived** by `tools/derive_reference.py` from the
+    controlled sources vendored in `reference/source/`. Do not hand-edit; run `make reference`.
+  - `policy.json` — **hand-authored** provisional rulings. Owned by named people at Thornbury, listed
+    per rule. See [`docs/working-answers.md`](docs/working-answers.md).
 
 **Outputs:**
 
-- _[Dataset / table / file / API response]_ — _[schema or link]_ — _[downstream consumers]_
+- **`decisions.jsonl`** — one line per document, `accept` or `hold`, carrying `schema_version`,
+  `spec_revision`, and on a hold the `route` and structured `findings`. Consumed by the engagement's
+  `validate_submission.py` today; by the ERP lot-creation endpoint from stage 3.
+- **Not produced:** an ERP payload. `policy.json` records the `expiry_date ← retest_date` mapping and
+  the three fields the ERP cannot store, but no emitter exists — the mapping is a decision awaiting
+  Purchasing (Q14), not code awaiting time.
 
 ---
 
@@ -177,8 +195,18 @@ If there are no ADRs yet, write them. If you can't articulate why a non-obvious 
 that's the signal that an ADR is needed.
 -->
 
-- _[Brief decision summary]_ — see [ADR-001: Title](decisions/001-title.md)
-- _[Brief decision summary]_ — see [ADR-002: Title](decisions/002-title.md)
+- **`hold` is a conclusion, not a failure** — the judgement is the product, so abstaining is a
+  first-class answer. See [ADR-0001](decisions/0001-hold-is-a-first-class-answer-not-a-pipeline-failure.md).
+- **Reference data is derived, never hand-kept** — and freshness is not correctness, so the generator
+  is verified independently of itself. See [ADR-0002](decisions/0002-derive-the-spec-7-reference-data-instead-of-hand-keeping-it.md).
+- **Extraction is a seam; OCR is out of scope** — see [ADR-0003](decisions/0003-treat-extraction-as-a-seam-and-keep-ocr-out-of-scope.md).
+- **The system never releases a lot** — it creates at the ERP's default `held`; a person releases.
+  See [ADR-0004](decisions/0004-the-system-never-releases-a-lot.md).
+- **Holds route to four queues, not one** — 39% held as a single pile would break the team this
+  project exists to help. See [ADR-0005](decisions/0005-route-holds-to-four-queues-not-one.md).
+- **Dates resolve by a four-step ladder, holding at the bottom** — see [ADR-0006](decisions/0006-resolve-dates-by-a-four-step-ladder-and-hold-at-the-bottom.md).
+- **Parse deterministically; hold what we cannot read** — an unseen layout must under-read, never
+  mis-read. See [ADR-0007](decisions/0007-parse-deterministically-and-hold-what-we-cannot-read.md).
 
 ---
 
@@ -193,7 +221,9 @@ What's the recommendation? What's the confidence level? Link to the detailed not
 report(s) for full analysis. This is the section a non-technical reader will read first.
 -->
 
-_[For exploratory repos, summarize what was learned and what the recommendation is. State the confidence level and the data caveats.]_
+**Skipped — this is a rules engine, not an exploratory repo.** The analytical findings that came out
+of reading the corpus live in [`docs/open-questions.md`](docs/open-questions.md) (what the sample
+contains) and [`docs/working-answers.md`](docs/working-answers.md) (what it implies for the business).
 
 ---
 
@@ -208,8 +238,24 @@ it belongs here. This is the section that saves the most time for someone landin
 for the first time.
 -->
 
-- _[Issue / gotcha and how to handle it]_
-- _[Issue / gotcha and how to handle it]_
+- **Half the supplied sample (18/36) carries an anomaly**, against the intake lead's estimate of "a
+  handful a month" out of ~1,600. Either the sample is enriched for difficulty or the current process
+  misses a great deal. **Do not quote rates from this corpus as production estimates.**
+- **There is no labelled set.** Every number this repo states about its own behaviour is arithmetic
+  over 36 documents, not a measurement. Nothing here is an accuracy claim.
+- **`reference/source/` holds a *copy* of a controlled document.** Nobody owns telling this repo that
+  SPEC-7 was revised. The staleness gate (`policy.json` → `spec_staleness`) makes the copy expire
+  loudly rather than rot silently, but it does not fix the governance gap.
+- **`make placeholders` only catches the markers it has been taught.** It has now missed unfilled
+  template text twice: once on the fill-me marker in `REPO-SURFACE.yaml`, and once on the
+  underscore-bracket marker this template ships, across 32 blocks in this file. If you add a
+  template, add its marker to the `placeholders` grep in the Makefile.
+- **`uv` is pinned to a managed interpreter** (`python-preference = "only-managed"`). Without it, uv
+  adopts any system Python matching `requires-python` — on the machine this was built on, an Anaconda
+  3.11.5 with a broken `_ctypes`, which took out the CVE audit.
+- **The parser is deliberately brittle in one direction.** A layout it does not recognise yields
+  *nothing* and the lot holds. That is the design (ADR-0007), not a bug — do not add a best-effort
+  fallback without reading that ADR first.
 
 ---
 
@@ -223,10 +269,14 @@ Pointer to the runbook with operational detail. Brief summary of the most import
 operational facts here so a reader doesn't have to context-switch for the basics.
 -->
 
-- **Monitoring:** _[where to look for health / errors]_
-- **Logs:** _[where to find logs]_
-- **On-call / support:** _[who is responsible for response]_
-- **Common operational tasks:** see [`/docs/runbook.md`](docs/runbook.md)
+- **Monitoring:** none — nothing is deployed. Stage 2 of the deployment plan adds run-level counts
+  (accepted / held per route) as the first thing worth watching.
+- **Logs:** the run prints to stdout/stderr; `decisions.jsonl` is the durable record of what was
+  decided and why. There is no log aggregation because there is no service.
+- **On-call / support:** none. The solutioner of record (see `engine.yaml`) is the only contact, which
+  is itself a handover risk — see [`docs/handover.md`](docs/handover.md).
+- **Common operational tasks:** `make reference` after a SPEC-7 revision; `make freshness` to check
+  the derived data is current; `make run` for a batch.
 
 ---
 
@@ -240,10 +290,16 @@ to look for adjacent functionality. If this repo is part of a larger system, thi
 the map. If a repo was superseded, name the successor here.
 -->
 
-- **Data ingestion:** _[repo name and link]_
-- **Downstream consumer:** _[repo name and link]_
-- **Shared utilities / common code:** _[repo name and link]_
-- **Original exploration / R&D:** _[repo name and link, marked as archived if applicable]_
+- **The certificates themselves.** Not committed and never should be — they are client documents and
+  a runtime input. The engagement corpus lives in the `student-materials` bundle.
+- **OCR / PDF extraction.** Out of scope for this build (ADR-0003). The seam is
+  `extraction.Extractor`; what productionalising it takes is in
+  [`docs/reference/extraction-stub.md`](docs/reference/extraction-stub.md).
+- **The ERP integration.** No client for the lot-creation endpoint exists here. Owned by Thornbury IT,
+  whose change process is still unknown (Q16) — which is why stage 1 does not depend on it.
+- **The review queue.** A held lot reaches a person as a line in a file. No UI, by scope choice.
+- **A labelled evaluation set.** Does not exist anywhere yet. It is the highest-value missing thing.
+- **Superseded by / supersedes:** nothing. This is the first repo of this engagement.
 
 ---
 

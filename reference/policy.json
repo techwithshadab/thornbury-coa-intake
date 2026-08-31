@@ -106,6 +106,15 @@
       "owner": "Quality (Marisol Vega)"
     },
     {
+      "id": "spec_revision_withdrawn",
+      "ruling": "R2",
+      "order": 45,
+      "action": "hold",
+      "route": "quality",
+      "message": "The certificate cites a withdrawn revision of SPEC-7. SPEC-7 s4: the lot is referred to Quality and shall not be accepted on the strength of the certificate alone.",
+      "owner": "Quality (Marisol Vega)"
+    },
+    {
       "id": "method_not_reportable",
       "ruling": "R2",
       "order": 50,

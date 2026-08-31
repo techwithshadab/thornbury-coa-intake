@@ -64,9 +64,9 @@ be read as an attestation.
 **`decisioning_or_scoring`** — externalized policy ✅ · one runtime path ✅ · missing-is-not-zero ✅
 (`test_an_unreported_attribute_is_absent_not_zero`) · provenance ✅ · explanation-as-contract ✅ ·
 abstain semantics ✅ (ADR-0001) · versioned outputs ✅.
-**F10 — compile-at-a-boundary is half-built:** `reference` data compiles raw→domain, but the
-certificate compile step (text → `Certificate`) does not exist, so `cli.run` hands `decide()` an empty
-certificate. **F11 — no eval/gold set.** `CLAUDE.md` names it as an invariant that does not yet hold;
+**F10 — RESOLVED 2026-08-30.** The certificate compile step now exists (`parse.py`, ADR-0007):
+validated raw → `Certificate` → `decide()`. Externalized policy strengthened too — every ruling moved
+into `reference/policy.json` with a named owner, so a domain fact changes without a code change. **F11 — no eval/gold set.** `CLAUDE.md` names it as an invariant that does not yet hold;
 every quality claim about this system is currently unfalsifiable. This is the most important open item
 and it blocks Bar B2.
 
@@ -91,6 +91,13 @@ properly once the compile step lands.
 `schema_version` on every line, `test_every_document_produces_exactly_one_line`) and the output passes
 the engagement's own `validate_submission.py`. **F12 — no committed contract artifact** (a JSON schema)
 and no CI check failing a breaking change without a version bump.
+
+> **Re-scored 2026-08-30 after the rules landed.** F10 resolved. Four core lines newly pass that did
+> not before: the SPEC-7 §4 withdrawn-revision rule closed a dead field, the staleness gate reads its
+> policy dates through an injected clock, `make check` is green with **no skips** (the prettier hook —
+> the only gate needing node — was removed with reasoning recorded), and the placeholder gate was
+> widened twice after it was found passing over unfilled template text. Test count 32 → 62.
+> **F1–F9, F11, F12 remain open and unchanged.**
 
 ## Conditions
 1. F3 and F11 before any quality claim is made about this system.
