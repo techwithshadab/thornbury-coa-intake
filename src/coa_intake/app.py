@@ -39,6 +39,20 @@ def _check_readable(certificate: Certificate, policy: Policy) -> list[Finding]:
     return [_finding(policy, "unparseable", evidence=f"could not read: {', '.join(missing_core)}")]
 
 
+def _check_spec_revision(certificate: Certificate, spec: Spec, policy: Policy) -> list[Finding]:
+    """SPEC-7 §4: a certificate citing a withdrawn revision is referred to Quality."""
+    cited = certificate.cited_spec_revision
+    if cited and cited != spec.revision:
+        return [
+            _finding(
+                policy,
+                "spec_revision_withdrawn",
+                evidence=f"certificate cites revision {cited}; current revision is {spec.revision}",
+            )
+        ]
+    return []
+
+
 def _check_identity(
     certificate: Certificate, policy: Policy, approved_suppliers: frozenset[str]
 ) -> list[Finding]:
@@ -143,6 +157,7 @@ def decide(
     explanation = [f"judged against {spec.document} rev {spec.revision} under policy {policy.version}"]
     findings = _check_readable(certificate, policy)
     findings += _check_identity(certificate, policy, approved_suppliers)
+    findings += _check_spec_revision(certificate, spec, policy)
 
     by_attribute = {m.attribute: m for m in certificate.results}
     for criterion in spec.attributes:

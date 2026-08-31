@@ -44,6 +44,9 @@ MATERIAL_CODE = re.compile(r"\b[A-Z]{3}-\d{3}\b")
 
 NUMBER = re.compile(r"-?\d+(?:\.\d+)?")
 
+# "SPEC-7 rev C" / "SPEC-7 Revision C". Deliberately NOT matching "SPEC-7 M-01", which is a method.
+CITED_REVISION = re.compile(r"SPEC-7\s*(?:rev(?:ision)?\.?)\s*([A-Z])\b", re.IGNORECASE)
+
 MONTHS = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
 ISO_DATE = re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b")
 TEXT_DATE = re.compile(rf"\b(\d{{1,2}})\s+({MONTHS})[a-z]*\.?\s+(\d{{4}})\b", re.IGNORECASE)
@@ -273,5 +276,6 @@ def parse_certificate(extraction, policy: Policy, approved: frozenset[str]):
         manufacture_date=_read_date(mfg_raw, text, supplier, policy) if mfg_raw else None,
         retest_date=_read_date(retest_raw, text, supplier, policy) if retest_raw else None,
         results=_results(text, extraction.doc_id, policy),
+        cited_spec_revision=(m.group(1).upper() if (m := CITED_REVISION.search(text)) else None),
         lot_id_conflicts=lot_tokens if len(lot_tokens) > 1 else (),
     )

@@ -13,6 +13,7 @@ reason, never a silence — a missing line reads as "no opinion", and there is n
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import pathlib
 import sys
@@ -74,10 +75,40 @@ def _to_line(decision: Decision) -> dict:
     return out
 
 
-def run(documents_root: pathlib.Path, reference_root: pathlib.Path, out: pathlib.Path) -> int:
+def check_spec_freshness(policy, today: dt.date) -> str | None:
+    """Ruling R4: nobody owns telling this repo that SPEC-7 was revised, so it assumes its copy goes
+    stale on schedule. Past `warn_after` it says so; past `fail_after` it refuses to run.
+
+    The clock is a PARAMETER. Reading it here rather than inside the rules keeps `decide()`
+    deterministic, and this the only place in `src/` that a date enters at all.
+    """
+    if today >= dt.date.fromisoformat(policy.fail_after):
+        raise RuntimeError(
+            f"the vendored SPEC-7 copy went past its review horizon on {policy.fail_after} and "
+            f"today is {today}. Nobody owns notifying this repo of a revision (open question Q4), "
+            f"so it refuses to judge lots against a specification it cannot vouch for. Re-vendor "
+            f"reference/source/ from the QMS, re-run `make reference`, and move the dates in "
+            f"reference/policy.json."
+        )
+    if today >= dt.date.fromisoformat(policy.warn_after):
+        return (
+            f"WARNING: the vendored SPEC-7 copy passed its annual review date ({policy.warn_after}). "
+            f"Confirm rev {policy.version} is still current before relying on these decisions."
+        )
+    return None
+
+
+def run(
+    documents_root: pathlib.Path,
+    reference_root: pathlib.Path,
+    out: pathlib.Path,
+    today: dt.date | None = None,
+) -> int:
     """Walk every document once, decide, write one line each. Returns the number of lines."""
     spec = load_spec(reference_root)
     policy = load_policy(reference_root)
+    if warning := check_spec_freshness(policy, today or dt.date.today()):
+        print(warning, file=sys.stderr)
     approved = load_supplier_master(reference_root)
     extractor = TextFileExtractor()
 

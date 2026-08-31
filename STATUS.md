@@ -31,10 +31,12 @@ _Rules wired against SPEC-7 under `reference/policy.json`. On the 36 supplied do
 The rulings in `docs/working-answers.md` are decided but **not implemented** — they are documented policy,
 not code. In order:
 
-- **The deployment plan and the handover package** (deliverables 2 and 4), and the **working log**
-  (deliverable 6).
-- Withdrawn-revision detection (SPEC-7 §4). The staleness dates are in `policy.json` and nothing reads
-  them yet — a certificate citing rev C would currently pass unremarked.
+- **Push to a remote and make `check` a required status check.** Closes the worst handover finding
+  (checklist 2.5: all code on one laptop) and turns an unrun workflow into an actual gate.
+- **Have someone who did not build this read it.** Every ADR is self-signed and no PR has ever been
+  raised. Start them on `reference/policy.json` and ADR-0006.
+- **Send the notes** in `docs/questions-to-send.md` — Denis first; two of the others need names only
+  Priya can give.
 - A labelled evaluation set. Without one, no change to extraction or the rules can be *measured*, only
   asserted — and `CLAUDE.md` names this as an invariant that does not yet hold. **Every projected number
   in `working-answers.md` is arithmetic over 36 documents, not a measurement.**
@@ -46,14 +48,15 @@ which was a bigger gap than anything technical it turned up.
 | # | Deliverable | State |
 |---|---|---|
 | 1 | A working slice | **done for the supplied corpus** — parser + rules green, 22/14 |
-| 2 | A deployment plan that actually works | **missing** — fragments only (R16, ERP API off the critical path) |
+| 2 | A deployment plan that actually works | **done** — [`docs/deployment.md`](docs/deployment.md), four stages, blockers named |
 | 3 | Decision records | **done** — ADR-0001…0007 |
-| 4 | A handover package | **partial** — repo docs exist, no assembled package |
+| 4 | A handover package | **done** — [`docs/handover.md`](docs/handover.md), scored against the engine checklist |
 | 5 | `decisions.jsonl` | **done** — `submissions/decisions.jsonl`, passes `validate_submission.py` |
-| 6 | A working log — how AI was used, incl. what it got wrong | **missing** |
+| 6 | A working log — how AI was used, incl. what it got wrong | **drafted** — [`docs/working-log.md`](docs/working-log.md); needs your sign-off on the judgements |
 
-Deliverable 6 has at least two entries waiting: the sample anomaly count stated as 12/36 when it is
-18/36, and the two domain-model defects (M2) that came from designing before reading the corpus.
+All six now exist. **Two of the three "done" rows are producer-written and unaccepted** — the handover
+package self-reports two checklist items as FAILING (no remote, and setup never tested by anyone but
+its author), and the working log is drafted by the tool it reports on, which it says at the top.
 
 ## Not built, deliberately — with the reason
 - **OCR.** Out of scope per the engagement brief. The seam is `extraction.Extractor`; the one

@@ -236,3 +236,42 @@ def test_the_policy_declines_to_grant_release(ctx):
     _, policy, _ = ctx
     assert policy.may_set_released is False
     assert policy.creates_lot_at_status == "held"
+
+
+# --- SPEC-7 §4 and the staleness horizon ---------------------------------------------------------
+
+
+def test_a_certificate_citing_a_withdrawn_revision_is_referred_to_quality(ctx):
+    """SPEC-7 §4. No certificate in the supplied corpus cites a revision, so this rule has never
+    fired on real data — which is exactly why it needs a test rather than an assumption."""
+    text = CLEAN.replace("Aldergrove Mills", "Aldergrove Mills\nCertified against SPEC-7 rev C.")
+    decision = _decide(text, ctx)
+    assert decision.action == HOLD
+    assert any(f.code == "spec_revision_withdrawn" for f in decision.findings)
+    assert decision.route == ROUTE_QUALITY
+
+
+def test_a_method_reference_is_not_mistaken_for_a_revision(ctx):
+    """ "SPEC-7 M-01" appears on every certificate. Reading the M as a revision would hold all 36."""
+    assert _decide(CLEAN, ctx).certificate.cited_spec_revision is None
+
+
+def test_the_pipeline_refuses_to_run_on_a_specification_it_cannot_vouch_for(ctx):
+    """Ruling R4. Nobody owns telling this repo SPEC-7 was revised, so staleness fails closed."""
+    import datetime as dt
+
+    from coa_intake.cli import check_spec_freshness
+
+    _, policy, _ = ctx
+    with pytest.raises(RuntimeError, match="review horizon"):
+        check_spec_freshness(policy, dt.date(2030, 1, 1))
+
+
+def test_the_staleness_warning_fires_before_the_refusal(ctx):
+    import datetime as dt
+
+    from coa_intake.cli import check_spec_freshness
+
+    _, policy, _ = ctx
+    assert check_spec_freshness(policy, dt.date(2026, 8, 30)) is None
+    assert "WARNING" in check_spec_freshness(policy, dt.date(2027, 4, 1))
