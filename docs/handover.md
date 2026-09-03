@@ -120,7 +120,7 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 | Access inventory | **Complete** | `docs/access-inventory.md` — nothing is needed today, and every later need is blocked on a question nobody has been asked |
 | SECURITY.md reporting path | **Complete** | `SECURITY.md` |
 | Tests | **Complete** | 62, incl. invariant, negative, and mutation tests. `make check` green with no skips |
-| CI | **Partial — FAILING in substance** | `.github/workflows/check.yml` exists and runs the same `make check`. **It has never run**, because there is no remote, so it is not a required check and has not been observed to pass |
+| CI | **Partial — FAILING in substance** | `.github/workflows/check.yml` exists, is sound, and runs the same `make check`. **It has never executed**, because there is no remote. Publishing steps in §7 |
 | **Quality attestation (accuracy)** | **NOT STARTED** | No labelled set. No number. See below |
 | **≥2 owners per area** | **FAILING** | `CODEOWNERS` names roles, but one human has touched every line and no second person has reviewed any of it |
 
@@ -168,6 +168,7 @@ disagreement this repo expects from you. Start there.
 
 **Day 3 — push it to a remote and make `check` a required status check.** This closes checklist 2.5
 and turns the existing workflow into an actual gate. Highest ratio of value to effort in the repo.
+Exact commands in §8.
 
 **Day 4 — send the notes.** `docs/questions-to-send.md`, in the stated order: Denis first, then Priya
 (two of the remaining three notes need names only she can give), Marisol once Denis has introduced
@@ -190,7 +191,38 @@ you. Do not cold-email Marisol.
 
 ---
 
-## 7. Sign-off
+## 7. Publishing it
+
+Not yet done — this is checklist item 2.5, the worst finding in this package. The workflow at
+`.github/workflows/check.yml` is sound (PR trigger, `make setup` + `make check`, least-privilege
+`contents: read`, third-party actions pinned to commit SHAs) and has **never executed**, because there
+is nowhere for it to run.
+
+**Private, not public.** `reference/source/` holds vendored copies of Thornbury's SPEC-7 and supplier
+master. They are framed as controlled client documents, and a repo that reads as client QMS material
+does not belong in a public namespace regardless of its provenance.
+
+```bash
+brew install gh && gh auth login          # once
+cd thornbury-coa-intake
+gh repo create thornbury-coa-intake --private --source=. --push
+```
+
+Then in **Settings → Branches → Add rule** for `main`:
+- Require a pull request before merging
+- Require status checks to pass → select **`check`**
+- Require review from Code Owners (`CODEOWNERS` already routes `/decisions/`, `/reference/` and
+  `CLAUDE.md`)
+
+The last of those is what makes `CODEOWNERS` more than a text file, and it is what would have caught
+the fact that one person has reviewed every line of this repo.
+
+**Confirm the first run is green before you rely on it.** A workflow that has never run is a claim,
+not a gate — the same mistake as a freshness check nobody has watched fail.
+
+---
+
+## 8. Sign-off
 
 Handover is not complete until a receiver signs. Per the checklist's own rule, sign against the
 artifact, not against this table.
