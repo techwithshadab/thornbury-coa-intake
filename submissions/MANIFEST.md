@@ -26,7 +26,7 @@ redo.
 | SPEC-7 revision | D |
 | Documents | 36, from the supplied corpus |
 | Generated | 2026-09-03 |
-| MD5 (all three) | `248bbd2d6d11605576734b48e704b89c` |
+| MD5 (all three) | `472fd81c09e9f5502a2f4bb641d3bfcb` |
 
 ## Result
 

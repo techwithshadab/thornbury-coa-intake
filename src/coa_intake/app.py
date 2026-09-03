@@ -16,6 +16,14 @@ from .domain import ACCEPT, HOLD, Certificate, Decision, Finding, Spec
 from .policy import Policy
 
 
+def _names_agree(stated: str, expected: str) -> bool:
+    """Loose comparison — punctuation, case and spacing vary; the substance must not. Only the
+    leading token is compared, so "HPLC" matches "HPLC assay" but not "Karl Fischer"."""
+    norm = lambda t: "".join(ch for ch in t.casefold() if ch.isalnum())  # noqa: E731
+    a, b = norm(stated), norm(expected)
+    return a.startswith(b) or b.startswith(a)
+
+
 def _finding(policy: Policy, rule_id: str, *, attribute=None, evidence=None) -> Finding:
     rule = policy.rule(rule_id)
     return Finding(
@@ -82,15 +90,31 @@ def _check_attribute(criterion, measurement, policy: Policy) -> list[Finding]:
     findings: list[Finding] = []
     # SPEC-7 §3.1: a result from a non-reportable method is indicative and cannot release a lot.
     # The method is part of whether the number counts at all, so this is checked before limits.
-    if measurement.method != criterion.reportable_method:
+    # Compared on the SPEC-7 CODE, which identifies the method; the name is how a supplier wrote it.
+    if measurement.method_code != criterion.method_code:
         findings.append(
             _finding(
                 policy,
                 "method_not_reportable",
                 attribute=criterion.attribute,
                 evidence=(
-                    f"stated {measurement.method or 'no method'}; "
+                    f"stated {measurement.method_name or 'no method'} "
+                    f"({measurement.method_code or 'no SPEC-7 code'}); "
                     f"SPEC-7 requires {criterion.reportable_method}"
+                ),
+            )
+        )
+    elif measurement.method_name and not _names_agree(measurement.method_name, criterion.method_name):
+        # Right code, different name. The document contradicts itself about the method that decides
+        # whether its own number counts — the supplier needs asking, and we do not pick a side.
+        findings.append(
+            _finding(
+                policy,
+                "method_name_contradicts_code",
+                attribute=criterion.attribute,
+                evidence=(
+                    f"names {measurement.method_name!r} but cites {measurement.method_code}, "
+                    f"which SPEC-7 assigns to {criterion.method_name!r}"
                 ),
             )
         )

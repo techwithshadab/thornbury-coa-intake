@@ -38,6 +38,7 @@ class Policy:
     rules: tuple[Rule, ...]  # sorted by `order`; the first matching finding leads
     conversions: tuple[Conversion, ...]
     synonyms: dict[str, str]  # casefolded alias -> canonical SPEC-7 attribute
+    labels: dict[str, tuple[str, ...]]  # field name -> the labels that introduce it
     warn_after: str
     fail_after: str
     may_set_released: bool
@@ -84,6 +85,13 @@ def compile_policy(raw: RawPolicy) -> Policy:
             Conversion(c.attribute, c.from_unit, c.to_unit, c.factor) for c in raw.unit_conversions
         ),
         synonyms=synonyms,
+        labels={
+            "lot_id": tuple(raw.field_labels.lot_id),
+            "material_no": tuple(raw.field_labels.material_no),
+            "manufacture_date": tuple(raw.field_labels.manufacture_date),
+            "retest_date": tuple(raw.field_labels.retest_date),
+            "supplier": tuple(raw.field_labels.supplier),
+        },
         warn_after=raw.spec_staleness.warn_after,
         fail_after=raw.spec_staleness.fail_after,
         may_set_released=raw.release.may_set_released,

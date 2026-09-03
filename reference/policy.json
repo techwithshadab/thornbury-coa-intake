@@ -40,6 +40,17 @@
     }
   },
 
+  "field_labels": {
+    "ruling": "ADR-0007",
+    "owner": "solutioner-of-record",
+    "why": "The parser reads a field only from an explicit labelled pattern, so its vocabulary IS its coverage. Held as data so adding a supplier's label is a reviewed change, not a code edit. Adding a label is safe; it can only let us READ something we previously held on. Never add a label whose meaning differs from the field - notably, 'Expiry' is NOT a retest date (ruling R14), and no expiry label appears below on purpose.",
+    "lot_id": ["LOT", "Lot Number", "Lot No", "Lot ID", "Batch", "Batch No", "Batch Number", "Batch ID", "Batch ref", "Identification", "Sample ref"],
+    "material_no": ["Material No", "Material Code", "Item code", "Item No", "CODE", "Product Code", "Article No", "Article Code", "Part No", "Reference"],
+    "manufacture_date": ["MFGDATE", "MFG", "Mfg date", "Mfg Date", "Date of Manufacture", "Date of Mfg", "Manufactured", "Manufacturing Date", "Production Date", "Prod Date", "Produced"],
+    "retest_date": ["RETESTDATE", "RETEST", "Retest due", "Retest Date", "Retest On", "Retest by", "Re-test date", "Re-test by", "Next Test", "Valid until", "Valid to"],
+    "supplier": ["SUPPLIER", "Supplier", "Manufacturer", "Produced by"]
+  },
+
   "date_resolution": {
     "ruling": "R7 / ADR-0008 (supersedes ADR-0006)",
     "owner": "Denis Achebe",
@@ -94,6 +105,15 @@
       "route": "quality",
       "message": "The certificate states conformance for a result that is outside the limits. SPEC-7 s5: the certificate is in error and the lot is referred to Quality. The supplier needs correcting too.",
       "owner": "Quality (Marisol Vega)"
+    },
+    {
+      "id": "method_name_contradicts_code",
+      "ruling": "R2",
+      "order": 25,
+      "action": "hold",
+      "route": "supplier_query",
+      "message": "The certificate names one method and cites the SPEC-7 code of a different one. We will not choose which is true - the method determines whether the result counts at all (SPEC-7 s3.1), so a document that disagrees with itself about it needs the supplier, not a guess.",
+      "owner": "Denis Achebe"
     },
     {
       "id": "spec_revision_withdrawn",

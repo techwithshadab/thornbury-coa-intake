@@ -34,7 +34,7 @@ measurement, and there is no labelled set to make it one.
 |---|---|
 | **Runs** | `make run DOCS=<dir> OUT=<file>` — a batch CLI. Nothing is deployed. |
 | **Prerequisites** | `git`, `make`, `uv`. The interpreter is uv-managed and pinned, so the machine's own Python is not a variable. |
-| **The gate** | `make check` — hygiene, size, placeholders, derived-data freshness, lint, 62 tests, CVE audit. Green with no skips. |
+| **The gate** | `make check` — hygiene, size, placeholders, derived-data freshness, lint, 84 tests, CVE audit. Green with no skips. |
 | **Proven** | A clean clone reproduces `submissions/decisions.jsonl` byte-for-byte. Output passes the engagement's `validate_submission.py`. |
 | **Language** | Python 3.12.5, ~900 lines of source. No framework, no service, no database. |
 
@@ -57,6 +57,10 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 - **The parser is deliberately brittle in one direction.** An unrecognised layout yields nothing and
   the lot holds. That is ADR-0007, not a defect. **Do not add a best-effort fallback** — it converts
   the safe failure into the dangerous one and undoes the basis of the whole design.
+- **The safe way to widen coverage is `field_labels` in `reference/policy.json`.** Adding a label can
+  only let the parser *read* something it previously held on; it cannot make it misread. That is why
+  the vocabulary is data. `tests/test_robustness.py` holds 18 plausible layout variations and every
+  one must keep passing — a hold there is lost automation, which the ledger charges for.
 - **`reference/spec-7.json` and `supplier-master.json` are generated.** Hand-editing them is
   reverted by `make reference` and caught by `make freshness`. `policy.json` is the hand-authored one.
 - **Freshness is not correctness.** `make freshness` compares generator output to generator output;
@@ -119,7 +123,7 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 | Dependency vulnerabilities | **Complete** | `make audit` in `make check`; caught a real CVE (`pytest` PYSEC-2026-1845) on first run |
 | Access inventory | **Complete** | `docs/access-inventory.md` — nothing is needed today, and every later need is blocked on a question nobody has been asked |
 | SECURITY.md reporting path | **Complete** | `SECURITY.md` |
-| Tests | **Complete** | 62, incl. invariant, negative, and mutation tests. `make check` green with no skips |
+| Tests | **Complete** | 84, incl. invariant, negative, mutation, policy-consistency and layout-robustness tests. `make check` green with no skips |
 | CI | **Partial — FAILING in substance** | `.github/workflows/check.yml` exists, is sound, and runs the same `make check`. **It has never executed**, because there is no remote. Publishing steps in §7 |
 | **Quality attestation (accuracy)** | **NOT STARTED** | No labelled set. No number. See below |
 | **≥2 owners per area** | **FAILING** | `CODEOWNERS` names roles, but one human has touched every line and no second person has reviewed any of it |

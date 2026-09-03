@@ -16,6 +16,7 @@ domain objects, never loose dicts. Three laws are visible in the types themselve
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 # Bumped when the shape of an emitted decision changes. Any output that crosses a boundary or is
@@ -41,7 +42,10 @@ class Measurement:
     value: float  # in `unit`, already canonical
     unit: str  # canonical unit: converted on write, never at comparison time
     source: str  # doc_id + locator: which document, and where in it
-    method: str | None = None  # the method the certificate stated, or None if it stated none
+    # SPEC-7 §2 numbers the reportable method per attribute; the code is the identity, the name is
+    # how the supplier wrote it. Both are recorded: the code decides, the name is evidence.
+    method_code: str | None = None  # "M-01" — None if the certificate cited no SPEC-7 code
+    method_name: str | None = None  # "HPLC" — None if it named nothing
     stated_conformance: bool | None = None  # what the supplier claimed FOR THIS RESULT, if anything
     # SPEC-7 §2: "the conversion shall be recorded". These hold what the certificate actually said.
     original_value: float | None = None
@@ -80,7 +84,23 @@ class SpecAttribute:
     lower: float
     upper: float
     unit: str
-    reportable_method: str
+    reportable_method: str  # as SPEC-7 §2 prints it, e.g. "HPLC (SPEC-7 M-01)"
+
+    @property
+    def method_code(self) -> str:
+        """The SPEC-7 code — the part that identifies the method rather than describes it."""
+        m = re.search(r"M-\d+", self.reportable_method)
+        if not m:
+            raise ValueError(
+                f"{self.attribute}: reportable method {self.reportable_method!r} cites no SPEC-7 "
+                f"code, so there is nothing to compare a certificate against."
+            )
+        return m.group(0).upper()
+
+    @property
+    def method_name(self) -> str:
+        """The name SPEC-7 gives the method, e.g. 'HPLC'."""
+        return re.split(r"[(\[]", self.reportable_method)[0].strip()
 
 
 @dataclass(frozen=True)
