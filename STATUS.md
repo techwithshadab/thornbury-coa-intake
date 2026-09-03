@@ -14,14 +14,14 @@ next_milestone: decision rules against SPEC-7 — target TBD
 
 # STATUS — thornbury-coa-intake (SOW-2026-CAP-01)
 
-_Rules wired against SPEC-7 under `reference/policy.json`. On the 36 supplied documents: 22 accept,
-14 hold. No labelled set yet, so that split is arithmetic, not a measurement._
+_Rules wired against SPEC-7 under `reference/policy.json`. On the 36 supplied documents: 21 accept,
+15 hold. No labelled set yet, so that split is arithmetic, not a measurement._
 
 ## Now
 - **Milestone:** working slice — **on-track**. Deterministic parser (ADR-0007) and the SPEC-7 rules
   are wired, with every ruling held as reviewed data in `reference/policy.json`. `make check` is green
   with no skips, and a clean clone reproduces `submissions/decisions.jsonl` byte-for-byte.
-- **The split matches the hand analysis exactly** — 22/14, document for document, predicted in
+- **The split matches the hand analysis exactly** — 21/15, document for document, predicted in
   `docs/working-answers.md` before the code existed. That is a consistency check between two
   independent routes to the same answer. **It is not evidence the answers are right**: both routes are
   ours, and there is still no labelled set.
@@ -47,7 +47,7 @@ which was a bigger gap than anything technical it turned up.
 
 | # | Deliverable | State |
 |---|---|---|
-| 1 | A working slice | **done for the supplied corpus** — parser + rules green, 22/14 |
+| 1 | A working slice | **done for the supplied corpus** — parser + rules green, 21/15 |
 | 2 | A deployment plan that actually works | **done** — [`docs/deployment.md`](docs/deployment.md), four stages, blockers named |
 | 3 | Decision records | **done** — ADR-0001…0007 |
 | 4 | A handover package | **done** — [`docs/handover.md`](docs/handover.md), scored against the engine checklist |

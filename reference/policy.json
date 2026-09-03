@@ -40,32 +40,22 @@
     }
   },
 
-  "supplier_date_conventions": {
-    "ruling": "R7 / ADR-0006",
+  "date_resolution": {
+    "ruling": "R7 / ADR-0008 (supersedes ADR-0006)",
     "owner": "Denis Achebe",
-    "min_unambiguous_samples": 3,
-    "why": "A slash date whose components are both <=12 reads two ways. Where a supplier has at least this many unambiguous slash dates in the reviewed corpus AND they all agree, we read the ambiguous one by that convention and stamp it as an INFERENCE in the provenance. Otherwise we hold. The threshold of 3 is weakly grounded - see ADR-0006, which says so plainly.",
-    "conventions": [
-      {
-        "supplier": "Halewood Ingredients",
-        "order": "DMY",
-        "evidence": ["COA-0009:15/03/2026", "COA-0015:25/10/2026", "COA-0022:27/12/2026"],
-        "resolves": ["COA-0035"]
-      },
-      {
-        "supplier": "Brightmoor Botanicals",
-        "order": "MDY",
-        "evidence": ["COA-0008:01/21/2026", "COA-0012:06/22/2026", "COA-0031:06/17/2026"],
-        "resolves": []
-      }
+    "ladder": [
+      "1. unambiguous by construction - ISO 8601, a written month, or a slash date with a component > 12",
+      "2. the document states its own convention in prose - reading a document's own instructions is not inference",
+      "3. otherwise HOLD, routed to intake_keying"
     ],
-    "explicitly_not_inferred": [
-      {
-        "supplier": "Zeeland Bulk BV",
-        "why": "No unambiguous slash date anywhere in the corpus. The only thing pointing at day/month is that BV is a Dutch company form, which is a guess about a jurisdiction standing in for a fact about a document template. COA-0010 and COA-0036 hold.",
-        "affects": ["COA-0010", "COA-0036"]
-      }
-    ]
+    "why_no_supplier_inference": "An earlier version (ADR-0006) added a rung that resolved an ambiguous date from >=3 agreeing certificates by the same supplier. Dropped: we already refuse to infer Zeeland Bulk BV's convention because indirect evidence is not safe enough to release a lot on, and inferring Halewood's is the same class of move with marginally more evidence. The line between them was a threshold we chose, and it had been calibrated on the single case it admitted. Consistency is worth more than the one document it recovered.",
+    "evidence_considered_but_not_acted_on": {
+      "note": "Kept because it is real analysis and the next team should not have to redo it. It is NOT read by any code.",
+      "Halewood Ingredients": "writes day/month - COA-0009:15/03/2026, COA-0015:25/10/2026, COA-0022:27/12/2026",
+      "Brightmoor Botanicals": "writes month/day - COA-0008:01/21/2026, COA-0012:06/22/2026, COA-0031:06/17/2026",
+      "Zeeland Bulk BV": "no unambiguous slash date anywhere in the corpus - nothing to infer from"
+    },
+    "affects": ["COA-0010", "COA-0035", "COA-0036"]
   },
 
   "rules": [

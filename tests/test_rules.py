@@ -157,18 +157,19 @@ def test_a_document_stating_its_own_convention_is_read_not_inferred(ctx):
     assert decision.certificate.manufacture_date.resolution == "stated"
 
 
-def test_a_supplier_convention_resolves_but_is_stamped_as_an_inference(ctx):
-    """COA-0035. Halewood writes day/month on its other certificates. The claim is recorded as an
-    inference with its evidence, so a reviewer sees a claim rather than a reading."""
+def test_a_supplier_convention_is_never_used_to_resolve_a_date(ctx):
+    """COA-0035. Halewood does write day/month on its other certificates — and ADR-0008 removed the
+    rung that would have used that. Reading a date off a supplier's other paperwork is the same class
+    of move as guessing from their country, which we already refuse; the only thing separating them
+    was a threshold we chose, calibrated on the single case it admitted."""
     text = CLEAN.replace("Aldergrove Mills", "Halewood Ingredients").replace("2026-01-27", "07/02/2026")
     decision = _decide(text, ctx)
-    reading = decision.certificate.manufacture_date
-    assert reading.iso == "2026-02-07"
-    assert reading.resolution == "inferred"
-    assert "COA-0009" in reading.evidence
+    assert decision.certificate.manufacture_date.resolution == "ambiguous"
+    assert decision.action == HOLD
+    assert decision.route == ROUTE_INTAKE_KEYING
 
 
-def test_a_supplier_with_no_convention_is_never_guessed_at(ctx):
+def test_a_date_is_never_guessed_from_a_company_s_country(ctx):
     """Zeeland Bulk BV is Dutch, which is a fact about a jurisdiction and not about a template."""
     text = CLEAN.replace("Aldergrove Mills", "Zeeland Bulk BV").replace("2026-01-27", "02/08/2026")
     decision = _decide(text, ctx)

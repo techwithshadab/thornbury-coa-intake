@@ -1,7 +1,7 @@
 ---
 id: ADR-0006
 title: resolve dates by a four-step ladder and hold at the bottom
-status: Accepted
+status: Superseded by ADR-0008
 date: 2026-08-30
 category: architecture
 deciders: [solutioner-of-record, tech-lead]

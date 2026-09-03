@@ -204,7 +204,9 @@ that's the signal that an ADR is needed.
   See [ADR-0004](decisions/0004-the-system-never-releases-a-lot.md).
 - **Holds route to four queues, not one** — 39% held as a single pile would break the team this
   project exists to help. See [ADR-0005](decisions/0005-route-holds-to-four-queues-not-one.md).
-- **Dates resolve by a four-step ladder, holding at the bottom** — see [ADR-0006](decisions/0006-resolve-dates-by-a-four-step-ladder-and-hold-at-the-bottom.md).
+- **A date resolves only from the document in front of us** — the rung that inferred a supplier's
+  convention from their other certificates was removed on consistency grounds. See
+  [ADR-0008](decisions/0008-hold-every-ambiguous-date.md), superseding [ADR-0006](decisions/0006-resolve-dates-by-a-four-step-ladder-and-hold-at-the-bottom.md).
 - **Parse deterministically; hold what we cannot read** — an unseen layout must under-read, never
   mis-read. See [ADR-0007](decisions/0007-parse-deterministically-and-hold-what-we-cannot-read.md).
 

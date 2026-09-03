@@ -21,20 +21,20 @@ redo.
 
 | | |
 |---|---|
-| Commit | `5795117` |
+| Commit | `6f9067d` |
 | Policy version | 1.0.0 (status: **provisional**) |
 | SPEC-7 revision | D |
 | Documents | 36, from the supplied corpus |
 | Generated | 2026-09-03 |
-| MD5 (all three) | `c7107c63364da02cecb5f75affbea5d2` |
+| MD5 (all three) | `248bbd2d6d11605576734b48e704b89c` |
 
 ## Result
 
 | | Count | Share |
 |---|---:|---:|
-| accept | 22 | 61% |
+| accept | 21 | 58% |
 | hold → `quality` | 5 | 14% |
-| hold → `intake_keying` | 4 | 11% |
+| hold → `intake_keying` | 5 | 14% |
 | hold → `procurement` | 3 | 8% |
 | hold → `supplier_query` | 2 | 6% |
 

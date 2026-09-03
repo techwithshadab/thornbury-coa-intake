@@ -20,22 +20,25 @@ POLICY_PATH = pathlib.Path(__file__).resolve().parents[1] / "reference" / "polic
 RAW = RawPolicy.model_validate(json.loads(POLICY_PATH.read_text(encoding="utf-8")))
 
 
-def test_every_date_convention_meets_its_own_evidence_threshold():
-    """ADR-0006 rung 3 requires >= min_unambiguous_samples agreeing certificates. The threshold is
-    stated in the file and read by nothing, so it is asserted here."""
-    threshold = RAW.supplier_date_conventions.min_unambiguous_samples
-    for convention in RAW.supplier_date_conventions.conventions:
-        assert len(convention.evidence) >= threshold, (
-            f"{convention.supplier} claims a {convention.order} convention on "
-            f"{len(convention.evidence)} certificate(s); the policy requires {threshold}."
-        )
+def test_the_date_ladder_ends_in_a_hold():
+    """ADR-0008. The bottom rung must be a hold — a ladder whose last step resolves something is a
+    ladder that guesses. This is the property that keeps date handling honest."""
+    assert "HOLD" in RAW.date_resolution.ladder[-1].upper()
 
 
-def test_no_supplier_is_both_inferred_and_explicitly_not_inferred():
-    """Zeeland Bulk BV is listed as never-infer. A convention for it would silently override that."""
-    inferred = {c.supplier.casefold() for c in RAW.supplier_date_conventions.conventions}
-    refused = {n.supplier.casefold() for n in RAW.supplier_date_conventions.explicitly_not_inferred}
-    assert not (inferred & refused), f"contradiction in policy: {inferred & refused}"
+def test_the_date_ladder_reads_only_the_document_in_front_of_it():
+    """No rung may resolve a date from another document. The corpus evidence for per-supplier
+    conventions is kept in the policy as ANALYSIS and must not creep back in as a rule."""
+    rungs = " ".join(RAW.date_resolution.ladder).lower()
+    for forbidden in ("supplier convention", "other certificates", "country", "jurisdiction"):
+        assert forbidden not in rungs, f"the ladder has grown a rung that infers from {forbidden!r}"
+
+
+def test_the_dropped_inference_evidence_is_retained_as_analysis():
+    """Kept so the next team does not redo the corpus reading — and labelled as not-acted-on, so
+    nobody mistakes it for a rule."""
+    assert RAW.date_resolution.evidence_considered_but_not_acted_on
+    assert RAW.date_resolution.why_no_supplier_inference.strip()
 
 
 def test_rule_ids_and_orders_are_unique():

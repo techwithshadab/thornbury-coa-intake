@@ -56,15 +56,16 @@ class Measurement:
 class DateReading:
     """A date, and how confident we are about what it says.
 
-    `resolution` records which rung of the ADR-0006 ladder answered: `explicit` (ISO or a written
-    month), `stated` (the document declared its own convention), `inferred` (a supplier convention
-    drawn from other certificates), or `ambiguous` (nothing resolved it — hold).
+    `resolution` records which rung of the ADR-0008 ladder answered: `explicit` (ISO or a written
+    month), `stated` (the document declared its own convention), or `ambiguous` (nothing resolved
+    it — hold). There is no `inferred`: ADR-0008 removed the rung that read a date from a supplier's
+    other certificates, so nothing in this system resolves a date from anything but the document in
+    front of it.
     """
 
     raw: str
     iso: str | None = None
     resolution: str = "ambiguous"
-    evidence: str | None = None  # for `inferred`, the certificates the convention came from
 
     @property
     def is_resolved(self) -> bool:

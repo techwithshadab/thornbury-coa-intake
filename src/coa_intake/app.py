@@ -137,11 +137,6 @@ def _check_dates(certificate: Certificate, policy: Policy) -> tuple[list[Finding
             findings.append(
                 _finding(policy, "date_ambiguous", evidence=f"{name}: {reading.raw!r} reads two ways")
             )
-        elif reading.resolution == "inferred":
-            explanation.append(
-                f"{name}: {reading.raw!r} read as {reading.iso} by supplier convention — "
-                f"INFERRED from {reading.evidence}, not stated on this document"
-            )
         elif reading.resolution == "stated":
             explanation.append(
                 f"{name}: {reading.raw!r} read as {reading.iso} using the convention the document "

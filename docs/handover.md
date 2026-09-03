@@ -23,7 +23,7 @@ The judgement is the product. A certificate can be wrong — a transposed lot nu
 specification with PASS printed over it — and catching that is the part that matters. Releasing a lot
 that should have been held is a recall conversation; holding one unnecessarily is a day of delay.
 
-**On the 36 supplied documents: 22 accept, 14 hold.** That is arithmetic over a small sample, not a
+**On the 36 supplied documents: 21 accept, 15 hold.** That is arithmetic over a small sample, not a
 measurement, and there is no labelled set to make it one.
 
 ---
@@ -136,7 +136,7 @@ The engine's axiom is that the *receiver* accepts, and no receiver has. **Fix: p
 make `check` required, and have someone who did not build it read `policy.json` and ADR-0006 first.**
 
 **2. There is no labelled set, so there is no accuracy number.** Everything this repo says about its
-own behaviour is arithmetic over 36 documents. The 22/14 split matching the hand analysis exactly is
+own behaviour is arithmetic over 36 documents. The 21/15 split matching the hand analysis exactly is
 a consistency check between two routes that are *both ours* — it is not independent evidence.
 **Fix: ~200 certificates with a QA analyst's accept/hold and reason. It blocks the B2 go-live gate
 and it can start today, in parallel with everything else.**
@@ -162,9 +162,9 @@ so rather than working around it. Then run it over the corpus and diff against
 
 **Day 2 — read the rulings, not the code.** `docs/working-answers.md`, then `reference/policy.json`.
 Twenty-one decisions were made on the client's behalf. You are inheriting all of them and you should
-disagree with some. **ADR-0006's evidence threshold of 3 is the weakest and is documented as such** —
-it was chosen partly because the one supplier it admits happens to have exactly 3 supporting
-certificates, which is close to circular. Start there.
+disagree with some. **ADR-0008 supersedes ADR-0006 and is worth reading as a pair** — it removes a
+rule whose threshold had been calibrated on the single case it admitted. That is the shape of
+disagreement this repo expects from you. Start there.
 
 **Day 3 — push it to a remote and make `check` a required status check.** This closes checklist 2.5
 and turns the existing workflow into an actual gate. Highest ratio of value to effort in the repo.
