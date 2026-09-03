@@ -26,7 +26,8 @@ LINT        := uv run --frozen ruff check . && uv run --frozen ruff format --che
 endif
 # -------------------------------------------------------------------------------------------------------
 
-PRECOMMIT := pre-commit
+# Run through uv so the version is the one in uv.lock, not the one on the machine.
+PRECOMMIT := uv run --frozen pre-commit
 .DEFAULT_GOAL := help
 
 help: ## Show the available tools
@@ -35,17 +36,11 @@ help: ## Show the available tools
 
 setup: ## Install toolchain (frozen/locked) + pre-commit hooks (run once)
 	@$(SETUP_STACK)
-	@command -v $(PRECOMMIT) >/dev/null 2>&1 && $(PRECOMMIT) install || echo "↪ install pre-commit for hooks"
+	@$(PRECOMMIT) install >/dev/null && echo "✓ pre-commit hooks installed"
 	@echo "✓ on the rails — run 'make check' anytime"
 
 check: ## The whole ritual: hygiene (gitleaks/format) + size guard + lint + test
-	@if command -v $(PRECOMMIT) >/dev/null 2>&1; then \
-		$(PRECOMMIT) run --all-files || { echo "✗ hygiene gate failed — fix it, do not skip it"; exit 1; }; \
-	else \
-		echo "✗ pre-commit is not installed — the hygiene gate (secret scan, size, format) did NOT run."; \
-		echo "  Run 'make setup'. A gate that skips itself is worse than no gate: it reports green."; \
-		exit 1; \
-	fi
+	@$(PRECOMMIT) run --all-files || { echo "✗ hygiene gate failed — fix it, do not skip it"; exit 1; }
 	@$(MAKE) --no-print-directory size
 	@$(MAKE) --no-print-directory placeholders
 	@$(MAKE) --no-print-directory freshness
