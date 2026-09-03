@@ -17,7 +17,7 @@ that holds everything has not solved this, and neither has one that accepts ever
 **Current maturity: the slice runs end to end on the supplied corpus.** A deterministic parser
 (ADR-0007) reads the certificate; the SPEC-7 rules judge it; every ruling we made on Thornbury's behalf
 lives as reviewed data in `reference/policy.json`, not as branches in code. Over the 36 supplied
-documents: **22 accept, 14 hold**.
+documents: **21 accept, 15 hold**.
 
 **That split is arithmetic, not a measurement.** There is no labelled set, so nothing here is an
 accuracy claim — including the fact that the split matches the hand analysis in `docs/working-answers.md`

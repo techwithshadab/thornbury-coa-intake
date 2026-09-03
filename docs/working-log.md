@@ -82,16 +82,21 @@ seven ADRs, the analysis documents, the deployment plan, the handover package.
 **How I verified it, in descending order of how much I trust each:**
 
 1. **Independent prediction, then comparison.** Before any rules were written, the expected outcome
-   was worked out by hand from the corpus: 22 accept, 14 hold, with specific documents named. The
+   was worked out by hand from the corpus: **22 accept, 14 hold**, with specific documents named. The
    implementation produced exactly that, document for document. **This is the strongest evidence in
    the repo and it is still weak** — both routes to that answer were produced by the same
    collaboration, so it shows consistency, not correctness.
+
+   *(The split is now 21/15. Not because the prediction or the code was wrong, but because I later
+   removed a ruling — ADR-0008 supersedes ADR-0006 — and COA-0035 moved to hold. Recording that here
+   rather than quietly restating the prediction as 21/15, which is what a bulk find-and-replace across
+   these documents did on the first attempt and which would have falsified the record.)*
 2. **Gates that caught real defects.** The CVE audit found `pytest` PYSEC-2026-1845 on first run. The
    complexity ceiling forced a refactor of `decide()` rather than a suppression. A test caught a rule
    ordering defect. These are the checks working on their author, which is the point of having them.
-3. **Reading the output.** Checking that COA-0027's ppb→ppm conversion is recorded, that COA-0035's
-   inferred date names the certificates it was inferred from, that COA-0034 is read from the
-   convention the document states for itself.
+3. **Reading the output.** Checking that COA-0027's ppb→ppm conversion is recorded with what the
+   certificate originally said, that COA-0034's date is read from the convention the document states
+   for itself, and that COA-0010/0035/0036 hold rather than resolving to a plausible date.
 4. **Reading all 36 certificates myself.** Slower than everything above and the source of most of the
    corrections below.
 
@@ -119,7 +124,7 @@ Both were designed from the *specification* and not from the *documents*. Readin
 would have caught both in minutes.
 
 **3. Its first parser was badly broken, and the failure was loud only by luck of design.** First run
-produced 34 holds instead of 14 — a regex for the method name allowed runs of spaces and swallowed
+produced 34 holds instead of the expected 14 — a regex for the method name allowed runs of spaces and swallowed
 entire table rows. It was obvious because the design makes an unread field *absent* rather than
 guessed. A parser built the other way would have produced confident wrong numbers and looked fine.
 
@@ -142,6 +147,19 @@ supplier's other certificates when there are **≥3** agreeing examples. The one
 has exactly 3. That is close to circular, it is load-bearing for exactly one document, and **it is
 written into the ADR as a known weakness** — which is the right response, but I would rather it had
 not needed one. This is the decision I expect to be challenged on and the one I would concede first.
+
+---
+
+**8. And one I changed my mind on after it shipped.** ADR-0006 resolved an ambiguous date from a
+supplier's other certificates when ≥3 agreed. AI proposed it, documented the weakness honestly in the
+ADR, and I accepted it. On review I dropped it (ADR-0008): the ladder already refuses to infer
+Zeeland's convention from the fact that "BV" is Dutch, and inferring Halewood's from their other
+paperwork is the same class of move — the only thing separating them was a threshold we picked, and
+that threshold had been calibrated on the single case it admitted. It cost one document.
+
+The reason this belongs in a log about AI use: **AI wrote the weakness down accurately and built the
+thing anyway.** Documenting a flaw is not the same as acting on it, and I had read that ADR twice
+before the inconsistency registered.
 
 ---
 

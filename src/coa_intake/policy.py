@@ -33,19 +33,11 @@ class Conversion:
 
 
 @dataclass(frozen=True)
-class DateConvention:
-    supplier_key: str  # casefolded
-    order: str  # "DMY" | "MDY"
-    evidence: tuple[str, ...]
-
-
-@dataclass(frozen=True)
 class Policy:
     version: str
     rules: tuple[Rule, ...]  # sorted by `order`; the first matching finding leads
     conversions: tuple[Conversion, ...]
     synonyms: dict[str, str]  # casefolded alias -> canonical SPEC-7 attribute
-    date_conventions: dict[str, DateConvention]  # casefolded supplier -> convention
     warn_after: str
     fail_after: str
     may_set_released: bool
@@ -92,10 +84,6 @@ def compile_policy(raw: RawPolicy) -> Policy:
             Conversion(c.attribute, c.from_unit, c.to_unit, c.factor) for c in raw.unit_conversions
         ),
         synonyms=synonyms,
-        date_conventions={
-            c.supplier.casefold(): DateConvention(c.supplier.casefold(), c.order, tuple(c.evidence))
-            for c in raw.supplier_date_conventions.conventions
-        },
         warn_after=raw.spec_staleness.warn_after,
         fail_after=raw.spec_staleness.fail_after,
         may_set_released=raw.release.may_set_released,

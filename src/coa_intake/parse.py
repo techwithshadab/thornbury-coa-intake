@@ -98,8 +98,7 @@ def _read_explicit(raw: str) -> DateReading | None:
 
 
 def _read_ambiguous_slash(raw: str, doc_text: str, supplier: str | None, policy: Policy) -> DateReading:
-    """Rungs 2-4: both components <= 12, so the document itself has to tell us, or a reviewed
-    supplier convention does, or we hold. There is deliberately no rung for country of origin."""
+    """Rungs 2-3: both components <= 12, so the document itself has to tell us, or we hold."""
     m = SLASH_DATE.search(raw)
     if not m:
         return DateReading(raw=raw, resolution="ambiguous")
@@ -113,12 +112,9 @@ def _read_ambiguous_slash(raw: str, doc_text: str, supplier: str | None, policy:
     if STATED_MDY.search(doc_text):
         return DateReading(raw=raw, iso=f"{year}-{a:02d}-{b:02d}", resolution="stated")
 
-    # Rung 3 — a reviewed supplier convention, stamped as an INFERENCE, not a reading.
-    if supplier and (conv := policy.date_conventions.get(supplier.casefold())):
-        iso = f"{year}-{b:02d}-{a:02d}" if conv.order == "DMY" else f"{year}-{a:02d}-{b:02d}"
-        return DateReading(raw=raw, iso=iso, resolution="inferred", evidence=", ".join(conv.evidence))
-
-    # Rung 4 — nothing resolved it.
+    # Rung 3 — nothing resolved it. There is deliberately no rung that infers the convention from
+    # a supplier's OTHER certificates (ADR-0008 supersedes ADR-0006) and none that guesses from a
+    # company's country. Both are claims about paperwork standing in for a fact about this document.
     return DateReading(raw=raw, resolution="ambiguous")
 
 

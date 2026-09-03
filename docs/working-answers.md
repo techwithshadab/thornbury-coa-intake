@@ -30,16 +30,16 @@ On the 36 documents as given, applying every ruling below:
 
 | | Count | Share | Where it goes |
 |---|---:|---:|---|
-| **Auto-accept** — fields extracted, lot created, no keying | **22** | **61%** | ERP, at status `held` (ADR-0004) |
+| **Auto-accept** — fields extracted, lot created, no keying | **21** | **58%** | ERP, at status `held` (ADR-0004) |
 | Hold → **Quality** (SPEC-7 rule breach) | 5 | 14% | COA-0004, 0009, 0026, 0029, 0033 |
 | Hold → **procurement** (supplier not on master) | 3 | 8% | COA-0003, 0017, 0030 |
-| Hold → **intake, manual key** (unreadable/incomplete) | 4 | 11% | COA-0010, 0019, 0028, 0036 |
+| Hold → **intake, manual key** (unreadable/incomplete) | 5 | 14% | COA-0010, 0019, 0028, 0035, 0036 |
 | Hold → **supplier query** (document contradicts itself) | 2 | 6% | COA-0018, 0023 |
 
 **What that means at 400 certificates a week**, if this sample resembles a normal week — and see the
 caveat below, because it probably does not:
 
-- **Keying falls from ~400/week to ~44/week — an 89% reduction.** That is Priya's ask, delivered.
+- **Keying falls from ~400/week to ~56/week — an 86% reduction.** That is Priya's ask, delivered.
 - **~56 lots/week newly referred to Quality that are not referred today.** Denis's floor estimate is a
   handful a month. That is roughly a 20× increase in QA referrals — not because the system is
   over-cautious, but because it applies SPEC-7 consistently and people applying it by eye do not.
@@ -47,7 +47,7 @@ caveat below, because it probably does not:
 
 **The load-bearing caveat.** Half this sample carries an anomaly. That is almost certainly enriched — a
 teaching set, not a random week. If the true anomaly rate is a third of what we see, auto-accept lands
-nearer **85–90%** and QA referrals nearer 15/week. **Do not quote the 61% as a production estimate.** It
+nearer **85–90%** and QA referrals nearer 15/week. **Do not quote the 58% as a production estimate.** It
 is a floor derived from a pessimistic sample, and it is stated that way in every note we send.
 
 **The finding underneath the numbers.** The hold rate is not a measure of this system's weakness. It is
@@ -125,26 +125,26 @@ is real, it is an escalation in its own right, independent of this project.
 
 ### The contestable ones
 
-**R7 → Q7. Dates resolve by a four-step ladder, and stop at the first step that answers.**
+**R7 → Q7. A date resolves only from the document in front of us. Otherwise the lot holds.**
 
 1. **Unambiguous by construction** — ISO 8601, a written month, or a slash date with a component >12.
 2. **The document states its own convention** in prose (COA-0034: "All dates are written
    day/month/year"). Reading a document's own instructions is not inference.
-3. **Supplier convention**, only where that supplier has **≥3 unambiguous slash dates in the reviewed
-   corpus and they all agree**. Recorded in the decision's provenance as an inference, not as a read.
-4. **Otherwise → hold.**
+3. **Otherwise → hold**, routed to `intake_keying`.
 
-· **Why:** step 3 recovers COA-0035 (Halewood: `15/03`, `25/10`, `27/12` are all day/month, so
-`07/02/2026` is 7 February). Zeeland has no unambiguous slash date at all, so COA-0010 and COA-0036 stay
-held — which is the correct outcome, because the only thing pointing at day/month there is that "BV" is
-Dutch, and that is a guess about a country, not a fact about a supplier's template.
-· **Confidence: medium — the weakest ruling here, and the one most likely to be overruled.**
-· **Cost if wrong:** a wrong date on a retest field that drives reorder timing. Not a safety failure,
-but a real one.
-· **A weakness worth stating plainly:** the threshold of 3 was chosen partly because Halewood has exactly
-3. That is close to circular. It should be reviewed against a larger corpus before it is trusted, and
-until then it is doing real work on exactly one document.
-· **Overturned by:** Denis. → **ADR-0006**
+· **Why:** an earlier version added a rung that resolved an ambiguous date from ≥3 agreeing
+certificates by the same supplier, which recovered COA-0035. **Removed (ADR-0008 supersedes
+ADR-0006)** on consistency grounds rather than on the threshold: the ladder already refuses to infer
+Zeeland Bulk BV's convention because "BV is a Dutch company form" is a claim about a jurisdiction
+standing in for a fact about a document. Reading Halewood's convention off their *other paperwork* is
+the same kind of move with marginally better evidence, and the only thing separating the two was a
+number we chose — one that had been calibrated on the single case it admitted.
+· **Confidence: high now, where it was the weakest ruling before.** The rule states in one sentence
+and survives challenge.
+· **Cost:** COA-0035 holds. Accept/hold moved 22/14 → 21/15 — about 3% of the corpus, paid for a rule
+we can defend. And a real signal is being ignored: Halewood almost certainly does write day/month.
+· **Overturned by:** Denis (Q7). If he sanctions supplier-convention inference, rung 3 returns — with
+a threshold derived from data rather than from the case it admits. → **ADR-0008**
 
 **R6 → Q6. Provisional exchange rate: one wrong release ≈ 50 unnecessary holds. It does not currently
 bind.**

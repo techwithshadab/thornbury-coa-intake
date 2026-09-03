@@ -87,32 +87,18 @@ class RawSynonyms(BaseModel):
     map: dict[str, list[str]] = Field(min_length=1)
 
 
-class RawDateConvention(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class RawDateResolution(BaseModel):
+    """How dates resolve (ADR-0008). No supplier-convention inference: the ladder reads what the
+    document says and holds otherwise."""
 
-    supplier: str = Field(min_length=1)
-    order: str = Field(pattern="^(DMY|MDY)$")
-    evidence: list[str] = Field(min_length=1)
-    resolves: list[str] = Field(default_factory=list)
-
-
-class RawNotInferred(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    supplier: str
-    why: str
-    affects: list[str] = Field(default_factory=list)
-
-
-class RawDateConventions(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     ruling: str
     owner: str
-    why: str
-    min_unambiguous_samples: int = Field(ge=1)
-    conventions: list[RawDateConvention]
-    explicitly_not_inferred: list[RawNotInferred] = Field(default_factory=list)
+    ladder: list[str] = Field(min_length=1)
+    why_no_supplier_inference: str = Field(min_length=1)
+    evidence_considered_but_not_acted_on: dict[str, str]
+    affects: list[str] = Field(default_factory=list)
 
 
 class RawRule(BaseModel):
@@ -179,7 +165,7 @@ class RawPolicy(BaseModel):
     spec_staleness: RawStaleness
     unit_conversions: list[RawUnitConversion]
     attribute_synonyms: RawSynonyms
-    supplier_date_conventions: RawDateConventions
+    date_resolution: RawDateResolution
     rules: list[RawRule] = Field(min_length=1)
     erp_mapping: RawErpMapping
     release: RawRelease
