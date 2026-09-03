@@ -87,6 +87,21 @@ class RawSynonyms(BaseModel):
     map: dict[str, list[str]] = Field(min_length=1)
 
 
+class RawFieldLabels(BaseModel):
+    """The parser's labelled-pattern vocabulary. Its coverage is literally this list."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    ruling: str
+    owner: str
+    why: str
+    lot_id: list[str] = Field(min_length=1)
+    material_no: list[str] = Field(min_length=1)
+    manufacture_date: list[str] = Field(min_length=1)
+    retest_date: list[str] = Field(min_length=1)
+    supplier: list[str] = Field(min_length=1)
+
+
 class RawDateResolution(BaseModel):
     """How dates resolve (ADR-0008). No supplier-convention inference: the ladder reads what the
     document says and holds otherwise."""
@@ -165,6 +180,7 @@ class RawPolicy(BaseModel):
     spec_staleness: RawStaleness
     unit_conversions: list[RawUnitConversion]
     attribute_synonyms: RawSynonyms
+    field_labels: RawFieldLabels
     date_resolution: RawDateResolution
     rules: list[RawRule] = Field(min_length=1)
     erp_mapping: RawErpMapping

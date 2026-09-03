@@ -17,7 +17,20 @@ from .policy import Policy
 
 # Every certificate in the corpus cites its method as "<name> (SPEC-7 M-nn)", which makes the method
 # the most reliably extractable thing on the page — convenient, since SPEC-7 §3.1 makes it decisive.
-METHOD = re.compile(r"((?:[A-Za-z][A-Za-z0-9<>&/.-]*)(?:[ ][A-Za-z0-9<>&/.-]+)* ?\(SPEC-7\s+M-\d+\))")
+# A method is identified by its SPEC-7 CODE, not by the prose around it. SPEC-7 §2 numbers the
+# reportable method for each attribute, and that number is the unambiguous identity — the name is
+# how a supplier chose to write it. Matching the code makes the parser indifferent to whether a
+# certificate writes "HPLC (SPEC-7 M-01)", "HPLC [SPEC-7 M-01]", "per SPEC-7 M-01" or the bare code,
+# which is the single largest source of avoidable holds on an unseen layout: without it, ANY
+# punctuation a supplier chooses differently holds the lot, because §3.1 makes the method decisive.
+METHOD_CODE = re.compile(r"SPEC-7[\s.:-]*\(?\s*(M-\d+)\s*\)?", re.IGNORECASE)
+# The name a certificate states, read backwards from the code. Used to catch a document that names
+# one method and cites another's code — not used to decide whether the method is reportable.
+METHOD_NAME = re.compile(
+    r"((?:[A-Za-z][A-Za-z0-9<>&/.-]*)(?:[ ][A-Za-z0-9<>&/.-]+)*)"
+    r"[\s(\[]*SPEC-7[\s.:-]*\(?\s*M-\d+",
+    re.IGNORECASE,
+)
 # Connectors that sit in front of the method name in some layouts ("via HPLC (SPEC-7 M-01)").
 # They are not part of the method, and SPEC-7 §3.1 compares the method exactly.
 METHOD_CONNECTOR = re.compile(
@@ -125,13 +138,13 @@ def _read_date(raw: str, doc_text: str, supplier: str | None, policy: Policy) ->
     return _read_explicit(raw) or _read_ambiguous_slash(raw, doc_text, supplier, policy)
 
 
-def _supplier(text: str, approved: frozenset[str]) -> str | None:
+def _supplier(text: str, approved: frozenset[str], labels: tuple[str, ...]) -> str | None:
     """Labelled first, then a known approved name, then the first line that looks like a name.
 
     The third rung matters: an unapproved supplier must still be *read*, or it would be reported as
     an unreadable document rather than as the sourcing question it actually is.
     """
-    if value := _labelled(text, ["SUPPLIER", "Supplier", "Manufacturer"]):
+    if value := _labelled(text, list(labels)):
         return value
     if m := re.search(r"^\s*Issued by\s+(.+?)\.?\s*$", text, re.IGNORECASE | re.MULTILINE):
         return m.group(1).strip()
@@ -151,8 +164,10 @@ def _supplier(text: str, approved: frozenset[str]) -> str | None:
 
 def _measurement(line: str, doc_id: str, canonical: str, policy: Policy) -> Measurement | None:
     """Read one result row. Returns None when the row carries no usable value."""
-    method_match = METHOD.search(line)
-    method = METHOD_CONNECTOR.sub("", method_match.group(1).strip()) if method_match else None
+    code_match = METHOD_CODE.search(line)
+    method_code = code_match.group(1).upper() if code_match else None
+    name_match = METHOD_NAME.search(line)
+    method_name = METHOD_CONNECTOR.sub("", name_match.group(1).strip()) if name_match else None
 
     if line.lstrip().startswith("|"):
         # Pipe form: |R|Assay|100.019|%|99.0|101.0|HPLC (...)|PASS — positional, so read it that way
@@ -162,7 +177,7 @@ def _measurement(line: str, doc_id: str, canonical: str, policy: Policy) -> Meas
             return None  # not a result row — checked, not caught
         value, unit = float(parts[2]), parts[3]
     else:
-        stripped = LIMITS.sub(" ", METHOD.sub(" ", line))
+        stripped = LIMITS.sub(" ", METHOD_CODE.sub(" ", line))
         if not (m := VALUE_UNIT.search(stripped)):
             return None
         value, unit = float(m.group(1)), m.group(2)
@@ -185,7 +200,8 @@ def _measurement(line: str, doc_id: str, canonical: str, policy: Policy) -> Meas
         value=value,
         unit=unit,
         source=f"{doc_id}:{line.strip()[:60]}",
-        method=method,
+        method_code=method_code,
+        method_name=method_name,
         stated_conformance=stated,
         original_value=original_value,
         original_unit=original_unit,
@@ -242,10 +258,10 @@ def parse_certificate(extraction, policy: Policy, approved: frozenset[str]):
     from .domain import Certificate
 
     text = extraction.text
-    supplier = _supplier(text, approved)
+    supplier = _supplier(text, approved, policy.labels["supplier"])
 
-    lot = _labelled(text, ["LOT", "Lot Number", "Batch", "Batch ref", "Identification", "Sample ref"])
-    material = _labelled(text, ["Material No", "Item code", "CODE", "Reference"])
+    lot = _labelled(text, list(policy.labels["lot_id"]))
+    material = _labelled(text, list(policy.labels["material_no"]))
     if material is None or not MATERIAL_CODE.fullmatch(material):
         # Fall back to the code's shape. Distinct from a lot number, which carries four digits.
         m = MATERIAL_CODE.search(text)
@@ -255,14 +271,8 @@ def parse_certificate(extraction, policy: Policy, approved: frozenset[str]):
     # resolved. COA-0018 prints HLW-1185 in the header and HLW-1191 over the results.
     lot_tokens = tuple(sorted(set(re.findall(r"\b[A-Z]{3}-\d{4}\b", text))))
 
-    mfg_raw = (
-        _labelled(text, ["MFGDATE", "MFG", "Mfg date", "Date of Manufacture", "Manufactured", "Produced"])
-        or ""
-    )
-    retest_raw = (
-        _labelled(text, ["RETESTDATE", "RETEST", "Retest due", "Retest Date", "Valid until", "Re-test by"])
-        or ""
-    )
+    mfg_raw = _labelled(text, list(policy.labels["manufacture_date"])) or ""
+    retest_raw = _labelled(text, list(policy.labels["retest_date"])) or ""
 
     return Certificate(
         doc_id=extraction.doc_id,

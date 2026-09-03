@@ -65,7 +65,12 @@ def _to_line(decision: Decision) -> dict:
                 "attribute": m.attribute,
                 "result": m.value,
                 "unit": m.unit,
-                "method": m.method,
+                # Both halves: the code is what SPEC-7 compares, the name is what the supplier
+                # wrote. QA record the method for exactly this reason and the ERP cannot store it.
+                "method": " ".join(
+                    x for x in (m.method_name, f"(SPEC-7 {m.method_code})" if m.method_code else None) if x
+                )
+                or None,
                 **({"reported_as": f"{m.original_value} {m.original_unit}"} if m.was_converted else {}),
             }
             for m in cert.results
