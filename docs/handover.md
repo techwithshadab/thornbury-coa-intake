@@ -7,9 +7,9 @@
 > remembers doing it. Every "done" below names the artifact. The gaps are listed as plainly as the
 > completions, because a handover package that reports itself green is the one nobody trusts.
 
-**Honest summary: this repo can be inherited. It cannot yet be operated by someone else, and it has
-never been reviewed by anyone but its author.** Those two things are the handover risk, and neither
-is fixed by writing more documentation.
+**Honest summary: this repo can be inherited and it now builds green somewhere that is not this
+laptop. It has still never been reviewed by a second human.** That is the remaining handover risk,
+and it is not fixed by writing more documentation.
 
 ---
 
@@ -93,7 +93,7 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 | 2.1 | Master repo index | **N/A** | Single repo |
 | 2.2 | Named per convention | **Complete** | `thornbury-coa-intake` (client-product-component) |
 | 2.3 / 2.4 | Empty / superseded repos | **N/A** | First repo of the engagement |
-| 2.5 | **No code only on a laptop** | **FAILING** | **There is no remote.** Everything lives in one local clone. This is the single most serious item on the checklist and it is not close to passing |
+| 2.5 | **No code only on a laptop** | **Complete** (2026-09-03) | Pushed to `github.com/techwithshadab/thornbury-coa-intake` (private). Was the worst finding in this package; it is closed |
 | 2.6 | Branches merged or planned | **Complete** | Single `main`; no open branches |
 
 ### 3. README and technical documentation
@@ -101,7 +101,7 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 | # | Item | Status | Evidence / gap |
 |---|---|---|---|
 | 3.1 | README passes the template check | **Complete** | `make placeholders STRICT=1` clean — after the gate was widened twice to catch markers it had been missing |
-| 3.2 | **Setup tested by someone other than the author** | **FAILING** | Proven in a clean clone, but *by its author on the same machine*. Nobody else has run this. The checklist asks for exactly the thing we cannot self-certify |
+| 3.2 | **Setup tested by someone other than the author** | **Half done** | The *environment* half is now proven: CI runs `make setup && make check` on a clean Ubuntu runner carrying none of this machine's tools, and it is green. That is what caught the `pre-commit` defect below. The *human* half is still open — no person other than the author has followed the README |
 | 3.3 | Deployment notes | **Complete** | `docs/deployment.md` — four stages, blockers named |
 | 3.4 | Runbook | **Complete for what exists** | `docs/runbook.md` — run it, check it, the failure table, and when to stop and ask. No monitoring section, because nothing is deployed to monitor |
 | 3.5 | "What's NOT in this repo" filled | **Complete** | `README.md` |
@@ -124,7 +124,7 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 | Access inventory | **Complete** | `docs/access-inventory.md` — nothing is needed today, and every later need is blocked on a question nobody has been asked |
 | SECURITY.md reporting path | **Complete** | `SECURITY.md` |
 | Tests | **Complete** | 84, incl. invariant, negative, mutation, policy-consistency and layout-robustness tests. `make check` green with no skips |
-| CI | **Partial — FAILING in substance** | `.github/workflows/check.yml` exists, is sound, and runs the same `make check`. **It has never executed**, because there is no remote. Publishing steps in §7 |
+| CI | **Running, not yet required** | `.github/workflows/check.yml` runs the same `make check` and is **green** (run 33808585169). It is not yet a *required* status check — branch protection is the remaining step (§7). A job that does not block merge is a notification |
 | **Quality attestation (accuracy)** | **NOT STARTED** | No labelled set. No number. See below |
 | **≥2 owners per area** | **FAILING** | `CODEOWNERS` names roles, but one human has touched every line and no second person has reviewed any of it |
 
@@ -136,8 +136,9 @@ Ranked by how much they should worry you.
 
 **1. Nobody has reviewed this.** One author, no second pair of eyes, no PR ever raised. Every ADR is
 self-signed; `reviews/2026-08-29-conformance.md` is explicitly marked self-assessed and unaccepted.
-The engine's axiom is that the *receiver* accepts, and no receiver has. **Fix: put it on a remote,
-make `check` required, and have someone who did not build it read `policy.json` and ADR-0006 first.**
+The engine's axiom is that the *receiver* accepts, and no receiver has. The remote and CI are now in
+place, so the remaining fix is human: **make `check` required with CODEOWNERS review, and have someone
+who did not build it read `policy.json` and the ADR-0006/0008 pair first.**
 
 **2. There is no labelled set, so there is no accuracy number.** Everything this repo says about its
 own behaviour is arithmetic over 36 documents. The 21/15 split matching the hand analysis exactly is
@@ -197,22 +198,23 @@ you. Do not cold-email Marisol.
 
 ## 7. Publishing it
 
-Not yet done — this is checklist item 2.5, the worst finding in this package. The workflow at
-`.github/workflows/check.yml` is sound (PR trigger, `make setup` + `make check`, least-privilege
-`contents: read`, third-party actions pinned to commit SHAs) and has **never executed**, because there
-is nowhere for it to run.
+**Done, 2026-09-03** — `github.com/techwithshadab/thornbury-coa-intake`, private. Kept here because the
+remaining step is not.
+
+**What publishing immediately bought.** The workflow had never executed, and it **failed on its first
+run**. `make check` had been invoking whatever `pre-commit` was on `PATH`; this machine has one via
+Homebrew, a clean runner does not, so the hygiene gate reported that it had not run and failed. The
+earlier "clean clone" verification had missed it because the clone was on the *same machine* — a clone
+in another directory is not a clone elsewhere, which is precisely the trap the repo-fitness rubric
+names and which we walked into while quoting it. `pre-commit` is now a pinned dev dependency. **CI was
+the first genuinely independent environment this repo ever ran in, and it found a real defect in 12
+seconds.**
 
 **Private, not public.** `reference/source/` holds vendored copies of Thornbury's SPEC-7 and supplier
 master. They are framed as controlled client documents, and a repo that reads as client QMS material
 does not belong in a public namespace regardless of its provenance.
 
-```bash
-brew install gh && gh auth login          # once
-cd thornbury-coa-intake
-gh repo create thornbury-coa-intake --private --source=. --push
-```
-
-Then in **Settings → Branches → Add rule** for `main`:
+**Still outstanding — branch protection.** In **Settings → Branches → Add rule** for `main`:
 - Require a pull request before merging
 - Require status checks to pass → select **`check`**
 - Require review from Code Owners (`CODEOWNERS` already routes `/decisions/`, `/reference/` and
@@ -221,8 +223,9 @@ Then in **Settings → Branches → Add rule** for `main`:
 The last of those is what makes `CODEOWNERS` more than a text file, and it is what would have caught
 the fact that one person has reviewed every line of this repo.
 
-**Confirm the first run is green before you rely on it.** A workflow that has never run is a claim,
-not a gate — the same mistake as a freshness check nobody has watched fail.
+Until those are set, `check` runs but does not block a merge, and `CODEOWNERS` is a text file rather
+than a gate. The second of them is what would catch the fact that one person has reviewed every line
+here.
 
 ---
 
