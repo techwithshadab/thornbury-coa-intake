@@ -1,0 +1,19 @@
+ANALYTICAL REPORT
+Sample ref: SRE-3308
+
+Parameter         Found             Limits              Technique
+----------------  ----------------  ------------------  ------------------------------
+Assay             99.936 %          99.0 to 101.0       HPLC (SPEC-7 M-01)
+Moisture          0.289 %           0.0 to 0.5          Karl Fischer (SPEC-7 M-04)
+Heavy Metals      5.93 ppm          0.0 to 10.0         ICP-MS (SPEC-7 M-11)
+Bulk Density      0.655 g/mL        0.45 to 0.75        USP <616> (SPEC-7 M-21)
+
+------------------------------------------------------------
+
+Batch ref .......... SRE-3308
+Article ............ Ascorbic Acid USP (ASC-220)
+Produced ........... 01/16/2026
+Re-test by ......... 01/16/2028
+
+Issued by Solvay Ridge Extracts.
+All results conform unless stated.

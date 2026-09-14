@@ -104,7 +104,7 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 | 3.2 | **Setup tested by someone other than the author** | **Half done** | The *environment* half is now proven: CI runs `make setup && make check` on a clean Ubuntu runner carrying none of this machine's tools, and it is green. That is what caught the `pre-commit` defect below. The *human* half is still open — no person other than the author has followed the README |
 | 3.3 | Deployment notes | **Complete** | `docs/deployment.md` — four stages, blockers named |
 | 3.4 | Runbook | **Complete for what exists** | `docs/runbook.md` — run it, check it, the failure table, and when to stop and ask. No monitoring section, because nothing is deployed to monitor |
-| 3.5 | "What's NOT in this repo" filled | **Complete** | `README.md` |
+| 3.5 | "What's NOT in this repo" filled | **Complete** | `README.md` — and shorter since `engagement/` was vendored |
 
 ### 4. Size and history
 
@@ -160,10 +160,11 @@ business case in opposite directions. **Do not quote rates from this corpus as p
 
 ## 5. Your first week
 
-**Day 1 — make it yours.** Clone, `make setup`, `make check`. If it is not green on your machine, that
-is a defect in this repo or its README, and it is the most valuable bug you will find this week — say
-so rather than working around it. Then run it over the corpus and diff against
-`submissions/decisions.jsonl`; it should match byte-for-byte.
+**Day 1 — make it yours.** Clone, `make setup`, `make check`, `make submission`. The corpus is
+vendored at `engagement/`, so there is nothing to locate. If `make check` is not green on your
+machine, that is a defect in this repo or its README and it is the most valuable bug you will find
+this week — say so rather than working around it. `make submission` regenerates the three submitted
+runs and asserts they are byte-identical to each other; `git diff submissions/` should be empty.
 
 **Day 2 — read the rulings, not the code.** `docs/working-answers.md`, then `reference/policy.json`.
 Twenty-one decisions were made on the client's behalf. You are inheriting all of them and you should

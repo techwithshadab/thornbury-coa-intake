@@ -11,7 +11,8 @@ section; until then, treating it as if it had one would be a lie.
 
 ```bash
 make setup                                     # once, per clone
-make run DOCS=/path/to/certificates OUT=decisions.jsonl
+make submission                                # the vendored corpus, three runs, validated
+make run DOCS=/path/to/certificates OUT=decisions.jsonl   # any other corpus
 ```
 
 Both paths are **inputs**. There is no default documents directory and there must never be one — this

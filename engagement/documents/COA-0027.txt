@@ -1,0 +1,19 @@
+Perrin & Co
+
+This document certifies that the material described below has been
+analysed in accordance with the applicable specification.
+
+Description ....... Ascorbic Acid USP
+Reference ......... ASC-220
+Identification .... PRC-8381
+Manufactured ...... 2026-08-13
+Valid until ....... 2028-08-13
+
+Analysis of identification PRC-8381:
+
+Determination     Requirement           Obtained          Procedure
+----------------  --------------------  ----------------  ------------------------------
+Assay             99.0-101.0 %          99.852 %          HPLC (SPEC-7 M-01)
+Moisture          0.0-0.5 %             0.271 %           Karl Fischer (SPEC-7 M-04)
+Heavy Metals      0.0-10.0 ppb          7276.0 ppb        ICP-MS (SPEC-7 M-11)
+Bulk Density      0.45-0.75 g/mL        0.653 g/mL        USP <616> (SPEC-7 M-21)

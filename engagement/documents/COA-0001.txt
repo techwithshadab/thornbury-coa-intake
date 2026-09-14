@@ -1,0 +1,19 @@
+ANALYTICAL REPORT
+Sample ref: ALD-5420
+
+Parameter         Found             Limits              Technique
+----------------  ----------------  ------------------  ------------------------------
+Assay             99.799 %          99.0 to 101.0       HPLC (SPEC-7 M-01)
+Moisture          0.389 %           0.0 to 0.5          Karl Fischer (SPEC-7 M-04)
+Heavy Metals      6.548 ppm         0.0 to 10.0         ICP-MS (SPEC-7 M-11)
+Bulk Density      0.531 g/mL        0.45 to 0.75        USP <616> (SPEC-7 M-21)
+
+------------------------------------------------------------
+
+Batch ref .......... ALD-5420
+Article ............ Malic Acid Fine (MAL-505)
+Produced ........... 2026-06-22
+Re-test by ......... 2028-06-22
+
+Issued by Aldergrove Mills.
+All results conform unless stated.

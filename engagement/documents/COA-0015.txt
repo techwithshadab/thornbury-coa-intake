@@ -1,0 +1,19 @@
+HALEWOOD INGREDIENTS
+CERTIFICATE OF ANALYSIS
+
+Product:            Sodium Citrate Dihydrate
+Material No:        SCD-315
+Lot Number:         HLW-1238
+Date of Manufacture:  25/10/2026
+Retest Date:        25/10/2028
+
+RESULTS  (lot HLW-1238)
+
+Test              Method                          Specification     Result
+----------------  ------------------------------  ----------------  ----------------  ------
+Assay             HPLC (SPEC-7 M-01)              99.0-101.0        99.855 %          PASS
+Moisture          Karl Fischer (SPEC-7 M-04)      0.0-0.5           0.104 %           PASS
+Heavy Metals      ICP-MS (SPEC-7 M-11)            0.0-10.0          2.433 ppm         PASS
+Bulk Density      USP <616> (SPEC-7 M-21)         0.45-0.75         0.526 g/mL        PASS
+
+Approved by Quality Assurance.

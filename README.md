@@ -76,12 +76,17 @@ Prerequisites: `git`, `make`, and [`uv`](https://docs.astral.sh/uv/) (which prov
 the version is pinned in `.python-version`). Nothing else.
 
 ```bash
-git clone <this repo> thornbury-coa-intake
+git clone https://github.com/techwithshadab/thornbury-coa-intake
 cd thornbury-coa-intake
 .githooks/install-rails.sh   # git never transmits hook config; re-run after every fresh clone
 make setup                   # frozen install from uv.lock + pre-commit hooks
 make check                   # the whole ritual — hygiene, size, freshness, lint, tests, CVE audit
+make submission              # reproduce the three submitted runs from the vendored corpus
 ```
+
+`make submission` is the shortest path to seeing this work: it runs the pipeline three times over
+`engagement/documents`, checks the output with the engagement's own `validate_submission.py`, and
+asserts the three runs are byte-identical.
 
 `make check` green on a fresh clone is the bar. If it is not green, that is a defect in this README or
 in the repo, not in your machine — say so.
@@ -111,7 +116,10 @@ The documents path and the reference path are **inputs**, never constants — th
 documents it has not seen.
 
 ```bash
-# Run the pipeline over a directory of certificates
+# Reproduce the submission from the corpus vendored in this repo
+make submission
+
+# Run the pipeline over any directory of certificates
 make run DOCS=/path/to/documents OUT=decisions.jsonl
 
 # Equivalently, the CLI directly
@@ -130,7 +138,7 @@ make audit       # dependency CVE gate
 Check the output's shape with the engagement's validator:
 
 ```bash
-python validate_submission.py decisions.jsonl /path/to/documents
+uv run python engagement/validate_submission.py decisions.jsonl /path/to/documents
 ```
 
 It checks that the file can be *read* — one line per document, required fields present, dates that mean
@@ -180,7 +188,8 @@ date, source system, owner).
 
 - **Certificate documents** — a directory of `.txt` extractions, passed as `--documents`. Owned by
   Thornbury Supply Operations. A runtime input, never a path inside the program: this pipeline is run
-  against documents it has not seen.
+  against documents it has not seen. The supplied corpus is vendored at `engagement/documents/` for
+  convenience; that is the Makefile's knowledge, not the program's.
 - **Reviewed reference data** — `reference/`, passed as `--reference`.
   - `spec-7.json`, `supplier-master.json` — **derived** by `tools/derive_reference.py` from the
     controlled sources vendored in `reference/source/`. Do not hand-edit; run `make reference`.
@@ -308,8 +317,11 @@ to look for adjacent functionality. If this repo is part of a larger system, thi
 the map. If a repo was superseded, name the successor here.
 -->
 
-- **The certificates themselves.** Not committed and never should be — they are client documents and
-  a runtime input. The engagement corpus lives in the `student-materials` bundle.
+- **Nothing, as of the materials being vendored.** `engagement/` now carries the brief, the 36
+  certificates, SPEC-7 and the supplied validator, so this repo is one thing to clone rather than two
+  to be told about. It is **not our work** — see [`engagement/README.md`](engagement/README.md).
+  The corpus remains a runtime *input*: `--documents` is required and no default path exists in
+  `src/`, enforced by `tests/test_no_hardcoded_corpus.py`.
 - **OCR / PDF extraction.** Out of scope for this build (ADR-0003). The seam is
   `extraction.Extractor`; what productionalising it takes is in
   [`docs/reference/extraction-stub.md`](docs/reference/extraction-stub.md).

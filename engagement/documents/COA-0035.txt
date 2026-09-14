@@ -1,0 +1,19 @@
+HALEWOOD INGREDIENTS
+CERTIFICATE OF ANALYSIS
+
+Product:            Citric Acid Anhydrous
+Material No:        CIT-100
+Lot Number:         HLW-7779
+Date of Manufacture:  07/02/2026
+Retest Date:        07/02/2028
+
+RESULTS  (lot HLW-7779)
+
+Test              Method                          Specification     Result
+----------------  ------------------------------  ----------------  ----------------  ------
+Assay             HPLC (SPEC-7 M-01)              99.0-101.0        99.723 %          PASS
+Moisture          Karl Fischer (SPEC-7 M-04)      0.0-0.5           0.242 %           PASS
+Heavy Metals      ICP-MS (SPEC-7 M-11)            0.0-10.0          2.762 ppm         PASS
+Bulk Density      USP <616> (SPEC-7 M-21)         0.45-0.75         0.588 g/mL        PASS
+
+Approved by Quality Assurance.

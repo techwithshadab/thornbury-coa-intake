@@ -1,0 +1,20 @@
+C E R T I F I C A T E   O F   A N A L Y S I S
+
+  Northfield Naturals
+
+  Item          : Guar Gum Powder
+  Item code     : GUA-410
+  Batch         : NFN-7327
+  Mfg date      : 2026-02-15
+  Retest due    : 2028-02-15
+
+  Results (batch NFN-7327):
+
+  Assay         : 99.65 %   [99.0-101.0]  PASS
+                  via HPLC (SPEC-7 M-01)
+  Moisture      : 0.291 %   [0.0-0.5]  PASS
+                  via Karl Fischer (SPEC-7 M-04)
+  Heavy Metals  : 2.093 ppm   [0.0-10.0]  PASS
+                  via ICP-MS (SPEC-7 M-11)
+  Bulk Density  : 0.576 g/mL   [0.45-0.75]  PASS
+                  via USP <616> (SPEC-7 M-21)

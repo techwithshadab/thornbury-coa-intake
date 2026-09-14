@@ -38,7 +38,8 @@ and `docs/handover.md` for what a receiving team would be inheriting.
 ## Boundary inventory
 - **Inputs:** a directory of certificate documents (`--documents`); a directory of reference data
   (`--reference`). Both are runtime inputs. The pipeline is run against documents it has not seen, so
-  neither path may be a constant.
+  neither path may be a constant — enforced by `tests/test_no_hardcoded_corpus.py`, which fails if any
+  file under `src/` so much as names `engagement/`.
 - **Outputs:** `decisions.jsonl` — one line per document, `accept` or `hold`, carrying `schema_version`.
 - **Contracts exposed:** the `decisions.jsonl` submission contract. Bump `domain.SCHEMA_VERSION` when it
   changes.
@@ -70,6 +71,8 @@ reference/
   source/         vendored controlled documents + PROVENANCE.md
   *.json          spec-7 + supplier-master are DERIVED — run `make reference`, do not hand-edit
   policy.json     HAND-AUTHORED — the provisional rulings, each with a named owner
+engagement/       THE SUPPLIED MATERIALS — brief, 36 certificates, SPEC-7, the validator.
+                  Not our work; vendored so the repo is one thing to clone. See its README.
 tests/            the suite, incl. the invariant tests
 docs/
   overview.md         this file

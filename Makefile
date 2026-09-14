@@ -75,6 +75,20 @@ audit: ## Dependency CVE gate (handles_secrets / external_network surfaces)
 # make the gate permanently red for a reason that is not a vulnerability, which is how gates get
 # disabled. pip-audit still exits non-zero on an actual finding, which is the gate's job.
 
+submission: ## Reproduce the three submitted runs from the vendored corpus
+	@for n in 1 2 3; do \
+		uv run --frozen coa-intake --documents engagement/documents --reference reference \
+			--out submissions/run-$$n/decisions.jsonl >/dev/null; \
+	done
+	@uv run --frozen coa-intake --documents engagement/documents --reference reference \
+		--out submissions/decisions.jsonl
+	@uv run --frozen python engagement/validate_submission.py submissions/run-1/decisions.jsonl engagement/documents
+	@if [ "$$(md5 -q submissions/run-*/decisions.jsonl | sort -u | wc -l | tr -d ' ')" = "1" ]; then \
+		echo "✓ all three runs byte-identical"; else echo "✗ runs differ — determinism is broken"; exit 1; fi
+# The path is passed EXPLICITLY here, and that is the point: the Makefile knowing where the corpus
+# lives is not the same as the program knowing. `coa-intake` has no default documents path and
+# tests/test_no_hardcoded_corpus.py fails if one appears.
+
 run: ## Run the pipeline:  make run DOCS=<dir> [OUT=decisions.jsonl]
 	@test -n "$(DOCS)" || { echo 'usage: make run DOCS=<documents dir> [OUT=decisions.jsonl]'; exit 1; }
 	@uv run --frozen coa-intake --documents "$(DOCS)" --reference reference --out "$(or $(OUT),decisions.jsonl)"
@@ -125,4 +139,4 @@ gate-check: ## Where the exit-package gate lives
 handover-check: ## Where the handover readiness checklist lives
 	@echo "Handover readiness → the 5-role checklist, linked from the exit package §4 M5 — keep its items green as you build"
 
-.PHONY: help setup check placeholders reference freshness audit run lint test size status new-adr new-record log gate-check handover-check
+.PHONY: help setup check placeholders reference freshness audit submission run lint test size status new-adr new-record log gate-check handover-check

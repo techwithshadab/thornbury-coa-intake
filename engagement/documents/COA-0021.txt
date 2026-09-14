@@ -1,0 +1,19 @@
+Vantree Organics
+
+This document certifies that the material described below has been
+analysed in accordance with the applicable specification.
+
+Description ....... Guar Gum Powder
+Reference ......... GUA-410
+Identification .... VTO-3771
+Manufactured ...... 28 Feb 2026
+Valid until ....... 28 Feb 2028
+
+Analysis of identification VTO-3771:
+
+Determination     Requirement           Obtained          Procedure
+----------------  --------------------  ----------------  ------------------------------
+Assay             99.0-101.0 %          99.73 %           HPLC (SPEC-7 M-01)
+Moisture          0.0-0.5 %             0.164 %           Karl Fischer (SPEC-7 M-04)
+Heavy Metals      0.0-10.0 ppm          4.484 ppm         ICP-MS (SPEC-7 M-11)
+Bulk Density      0.45-0.75 g/mL        0.623 g/mL        USP <616> (SPEC-7 M-21)

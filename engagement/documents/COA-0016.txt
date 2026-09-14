@@ -1,0 +1,35 @@
+Vantree Organics — Certificate of Analysis
+====================================================
+
+LOT: VTO-7819
+PRODUCT: Guar Gum Powder
+CODE: GUA-410
+MFG: 25 Dec 2026
+RETEST: 25 Dec 2028
+
+-- Test results for lot VTO-7819 --
+
+Assay:
+    result = 100.521 %
+    spec   = 99.0 .. 101.0 %
+    method = HPLC (SPEC-7 M-01)
+    status = PASS
+
+Moisture:
+    result = 0.308 %
+    spec   = 0.0 .. 0.5 %
+    method = Karl Fischer (SPEC-7 M-04)
+    status = PASS
+
+Heavy Metals:
+    result = 4.747 ppm
+    spec   = 0.0 .. 10.0 ppm
+    method = ICP-MS (SPEC-7 M-11)
+    status = PASS
+
+Bulk Density:
+    result = 0.593 g/mL
+    spec   = 0.45 .. 0.75 g/mL
+    method = USP <616> (SPEC-7 M-21)
+    status = PASS
+

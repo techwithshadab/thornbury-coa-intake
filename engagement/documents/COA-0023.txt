@@ -1,0 +1,19 @@
+Solvay Ridge Extracts
+
+This document certifies that the material described below has been
+analysed in accordance with the applicable specification.
+
+Description ....... Sodium Citrate Dihydrate
+Reference ......... SCD-315
+Identification .... SRE-6803
+Manufactured ...... 05/13/2026
+Valid until ....... 05/13/2028
+
+Analysis of identification SRE-6809:
+
+Determination     Requirement           Obtained          Procedure
+----------------  --------------------  ----------------  ------------------------------
+Assay             99.0-101.0 %          100.169 %         HPLC (SPEC-7 M-01)
+Moisture          0.0-0.5 %             0.222 %           Karl Fischer (SPEC-7 M-04)
+Heavy Metals      0.0-10.0 ppm          3.14 ppm          ICP-MS (SPEC-7 M-11)
+Bulk Density      0.45-0.75 g/mL        0.648 g/mL        USP <616> (SPEC-7 M-21)

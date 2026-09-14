@@ -45,7 +45,11 @@ src = ["src", "tests"]
 line-length = 110
 # `.claude/` is agent tooling the engine scaffolder vendors in — not this repo's source, and any fix
 # made there is reverted by the next re-scaffold. `.venv/` is the local toolchain.
-exclude = [".claude", ".venv"]
+# `engagement/` is the SUPPLIED material — the brief, the corpus, and the engagement's own
+# validate_submission.py. Linting it is meaningless and fixing it would be worse: the validator we
+# run has to be the one we were given, byte for byte, or checking our output against it proves
+# nothing. Excluded for the same reason as `.claude/` — vendored, not ours to change.
+exclude = [".claude", ".venv", "engagement"]
 
 [tool.ruff.lint]
 # C901 is the complexity ceiling (universal core: "a complexity ceiling where the stack supports it").

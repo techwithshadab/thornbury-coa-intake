@@ -1,0 +1,35 @@
+Aldergrove Mills — Certificate of Analysis
+====================================================
+
+LOT: ALD-7393
+PRODUCT: Ascorbic Acid USP
+CODE: ASC-220
+MFG: 23 Feb 2026
+RETEST: 23 Feb 2028
+
+-- Test results for lot ALD-7393 --
+
+Assay:
+    result = 99.714 %
+    spec   = 99.0 .. 101.0 %
+    method = HPLC (SPEC-7 M-01)
+    status = PASS
+
+Moisture:
+    result = 0.315 %
+    spec   = 0.0 .. 0.5 %
+    method = Loss on Drying (SPEC-7 M-03)
+    status = PASS
+
+Heavy Metals:
+    result = 2.094 ppm
+    spec   = 0.0 .. 10.0 ppm
+    method = ICP-MS (SPEC-7 M-11)
+    status = PASS
+
+Bulk Density:
+    result = 0.601 g/mL
+    spec   = 0.45 .. 0.75 g/mL
+    method = USP <616> (SPEC-7 M-21)
+    status = PASS
+

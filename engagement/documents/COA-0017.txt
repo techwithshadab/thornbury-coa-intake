@@ -1,0 +1,19 @@
+AKSOY GIDA TICARET AŞ
+CERTIFICATE OF ANALYSIS
+
+Product:            Sodium Citrate Dihydrate
+Material No:        SCD-315
+Lot Number:         AKG-9430
+Date of Manufacture: 15 Jan 2026
+Retest Date:        15 Jan 2028
+
+RESULTS  (lot AKG-9430)
+
+Test              Method                          Specification     Result
+----------------  ------------------------------  ----------------  ----------------  ------
+Assay             HPLC (SPEC-7 M-01)              99.0-101.0        99.977 %          PASS
+Moisture          Karl Fischer (SPEC-7 M-04)      0.0-0.5           0.169 %           PASS
+Heavy Metals      ICP-MS (SPEC-7 M-11)            0.0-10.0          6.19 ppm          PASS
+Bulk Density      USP <616> (SPEC-7 M-21)         0.45-0.75         0.6 g/mL          PASS
+
+Approved by Quality Assurance.

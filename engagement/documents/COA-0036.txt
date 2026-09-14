@@ -1,0 +1,19 @@
+ANALYTICAL REPORT
+Sample ref: ZLB-7873
+
+Parameter         Found             Limits              Technique
+----------------  ----------------  ------------------  ------------------------------
+Assay             99.435 %          99.0 to 101.0       HPLC (SPEC-7 M-01)
+Moisture          0.178 %           0.0 to 0.5          Karl Fischer (SPEC-7 M-04)
+Heavy Metals      6.213 ppm         0.0 to 10.0         ICP-MS (SPEC-7 M-11)
+Bulk Density      0.686 g/mL        0.45 to 0.75        USP <616> (SPEC-7 M-21)
+
+------------------------------------------------------------
+
+Batch ref .......... ZLB-7873
+Article ............ Sodium Citrate Dihydrate (SCD-315)
+Produced ........... 02/10/2026
+Re-test by ......... 02/10/2028
+
+Issued by Zeeland Bulk BV.
+All results conform unless stated.

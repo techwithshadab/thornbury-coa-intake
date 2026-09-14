@@ -1,0 +1,35 @@
+Solvay Ridge Extracts — Certificate of Analysis
+====================================================
+
+LOT: SRE-4452
+PRODUCT: Citric Acid Anhydrous
+CODE: CIT-100
+MFG: 16 Mar 2026
+RETEST: 16 Mar 2028
+
+-- Test results for lot SRE-4452 --
+
+Assay:
+    result = 99.451 %
+    spec   = 99.0 .. 101.0 %
+    method = HPLC (SPEC-7 M-01)
+    status = PASS
+
+Moisture:
+    result = 0.144 %
+    spec   = 0.0 .. 0.5 %
+    method = Loss on Drying (SPEC-7 M-03)
+    status = PASS
+
+Heavy Metals:
+    result = 4.649 ppm
+    spec   = 0.0 .. 10.0 ppm
+    method = ICP-MS (SPEC-7 M-11)
+    status = PASS
+
+Bulk Density:
+    result = 0.512 g/mL
+    spec   = 0.45 .. 0.75 g/mL
+    method = USP <616> (SPEC-7 M-21)
+    status = PASS
+
