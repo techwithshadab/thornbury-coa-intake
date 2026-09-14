@@ -17,6 +17,17 @@ they are meant to be three separate submissions, here they are.
 **If that reading is wrong, ask** — it is question Q26 in `docs/open-questions.md` and it is cheap to
 redo.
 
+## What to read
+
+| Path | What it is |
+|---|---|
+| `run-1/`, `run-2/`, `run-3/` | **The submission.** Three independent executions, byte-identical. |
+| `decisions.jsonl` | A convenience copy of the same output at the top level, for anyone who expects one file rather than three. Identical to each run — not a fourth result. |
+
+Regenerate all four with `make submission` from the repo root; it also runs the engagement's own
+validator and fails if the three runs diverge. CI runs it on every push and fails if the committed
+output changes.
+
 ## Provenance
 
 | | |

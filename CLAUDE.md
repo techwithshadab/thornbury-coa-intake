@@ -20,6 +20,13 @@ Their obligations are the go-live backlog in `STATUS.md`, not silently-passed li
 - Config/truth lives in reviewed files in-repo under `reference/`, **derived** by
   `tools/derive_reference.py` from the controlled sources vendored in `reference/source/`. Environment
   values come through `paths.py`, never hardcoded.
+- **`engagement/` is supplied material, not ours.** The brief, the 36 certificates, SPEC-7 and the
+  engagement's own validator, vendored so the repo is one thing to clone. Two standing rules:
+  nothing under `src/` or `tools/` may reference it (the corpus is a runtime input, and a default
+  that works on the supplied set is a wrong answer that passes locally), and no hook or formatter
+  may rewrite it (we must be scored against the bytes we were given). Both are enforced by
+  `tests/test_no_hardcoded_corpus.py`; `engagement/` is excluded from `ruff` and from every
+  file-modifying pre-commit hook, but **not** from the detecting ones.
 - State is none. The pipeline reads documents and writes one decisions file. It owns no database. When
   the audit trail becomes queryable, `stateful` turns true and this line changes with it.
 
@@ -107,6 +114,7 @@ fails, the owner, the deletion trigger, and the guard/test — under "Active com
 | Code-only refactor | `make lint test` |
 | Logic / boundary / entry-path change | `make check` (+ the eval set, once it exists) |
 | Reference data change | `make reference && make freshness test` — and review the JSON delta |
+| Anything that could move a decision | `make submission`, then `git diff submissions/`. A moved decision must be deliberate and described in the commit; CI fails if the committed output changes silently |
 | `reference/source/` change (a SPEC-7 revision) | `make reference`, an ADR, and a `CHANGELOG` entry |
 | Submission-contract change | `make check` + bump `SCHEMA_VERSION` + `CHANGELOG` |
 

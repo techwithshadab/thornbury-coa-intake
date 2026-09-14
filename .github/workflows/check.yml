@@ -35,6 +35,16 @@ jobs:
       - name: check
         run: make check
 
+      # The repo's central claim is that the committed submission reproduces from the vendored
+      # corpus. Until now nothing gated it: `make check` never ran the pipeline end to end, so a
+      # change that altered a decision would have gone green. `git diff --exit-code` is the gate —
+      # if the output moves, the commit has to say so.
+      - name: the committed submission still reproduces
+        run: |
+          make submission
+          git diff --exit-code -- submissions/ \
+            || { echo "::error::make submission changed the committed output"; exit 1; }
+
       # The placeholder gate runs as a WARNING inside `make check` by design — a fresh scaffold is full
       # of them on day one. On a PR it is fatal: template text reads as filled, so a reader skips it.
       - name: no template text left

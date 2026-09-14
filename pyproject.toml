@@ -29,6 +29,11 @@ dev = [
     # meant `make check` passed locally and failed on a clean runner -- the exact "green only where
     # the work was done" trap. A gate that decides pass/fail is a pinned input like any other.
     "pre-commit==4.0.1",
+    # F7: proves the suite is order-independent rather than asserting it. Randomises test order
+    # every run, so a test that only passes because another ran first fails loudly.
+    "pytest-randomly==3.16.0",
+    # F8: unused declared deps and undeclared imports. Both rot quietly.
+    "deptry==0.21.1",
 ]
 
 [tool.setuptools.packages.find]
@@ -65,3 +70,11 @@ max-complexity = 10
 # have taken out anything else touching ctypes. `only-managed` makes uv download and use its own
 # CPython, so two clones get the identical interpreter.
 python-preference = "only-managed"
+
+[tool.deptry.per_rule_ignores]
+# DEP002 is "declared but never imported". These six are declared because the Makefile EXECUTES
+# them — they are the gate, not libraries the code calls. That is a legitimate way to depend on
+# something, and pinning them is required by the universal core: a tool that decides pass/fail is a
+# pinned input. Note what is NOT listed: `pydantic`, the only real runtime dependency, which deptry
+# correctly finds imported. If a genuinely unused library is ever added, this list will not hide it.
+DEP002 = ["ruff", "pytest", "pytest-randomly", "pip-audit", "pre-commit", "deptry"]

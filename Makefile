@@ -45,6 +45,7 @@ check: ## The whole ritual: hygiene (gitleaks/format) + size guard + lint + test
 	@$(MAKE) --no-print-directory placeholders
 	@$(MAKE) --no-print-directory freshness
 	@$(MAKE) --no-print-directory lint
+	@$(MAKE) --no-print-directory deps
 	@$(MAKE) --no-print-directory test
 	@$(MAKE) --no-print-directory audit
 
@@ -67,6 +68,9 @@ reference: ## Derive reference/*.json from the controlled sources in reference/s
 
 freshness: ## Fail if the committed derived reference data is stale (generated_code surface)
 	@uv run --frozen python tools/derive_reference.py --check
+
+deps: ## Unused declared dependencies, and imports that were never declared
+	@uv run --frozen deptry src tools
 
 audit: ## Dependency CVE gate (handles_secrets / external_network surfaces)
 	@uv run --frozen pip-audit --skip-editable --progress-spinner off
@@ -139,4 +143,4 @@ gate-check: ## Where the exit-package gate lives
 handover-check: ## Where the handover readiness checklist lives
 	@echo "Handover readiness → the 5-role checklist, linked from the exit package §4 M5 — keep its items green as you build"
 
-.PHONY: help setup check placeholders reference freshness audit submission run lint test size status new-adr new-record log gate-check handover-check
+.PHONY: help setup check placeholders reference freshness deps audit submission run lint test size status new-adr new-record log gate-check handover-check

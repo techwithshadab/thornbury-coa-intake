@@ -203,6 +203,15 @@ wheels = [
 ]
 
 [[package]]
+name = "click"
+version = "8.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/0e/7fa0ef50764b67090eca4114772a2abf8b6148198475e54c660b97caeee6/click-8.5.0.tar.gz", hash = "sha256:ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34", size = 382235 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl", hash = "sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360", size = 125251 },
+]
+
+[[package]]
 name = "coa-intake"
 version = "0.1.0"
 source = { editable = "." }
@@ -212,18 +221,22 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "deptry" },
     { name = "pip-audit" },
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "pytest-randomly" },
     { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "deptry", marker = "extra == 'dev'", specifier = "==0.21.1" },
     { name = "pip-audit", marker = "extra == 'dev'", specifier = "==2.7.3" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = "==4.0.1" },
     { name = "pydantic", specifier = ">=2,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==9.1.1" },
+    { name = "pytest-randomly", marker = "extra == 'dev'", specifier = "==3.16.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.16.1" },
 ]
 
@@ -258,6 +271,26 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604 },
+]
+
+[[package]]
+name = "deptry"
+version = "0.21.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "packaging" },
+    { name = "requirements-parser" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7f/c2/392a8ca053ff59d1f9c700cab00d8720cea809aa2634189ccfe17c52f3f0/deptry-0.21.1.tar.gz", hash = "sha256:60332b8d58d6584b340511a4e1b694048499f273d69eaea413631b2e8bc186ff", size = 156671 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4c/0b/8f5a5f78fd01387f090284114b32653eebf08a1ca0a90fd8f7246ef03a81/deptry-0.21.1-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:c31e1a66502e28870e1e0a679598462a6119f4bcb656786e63cb545328170a3f", size = 1739018 },
+    { url = "https://files.pythonhosted.org/packages/09/e1/b0bccf884a6e6e3bfc1a049b7eb43a08e5f53d5460711358beece0ced321/deptry-0.21.1-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:4b53089c22d18076935a3e9e6325566fa712cd9b89fe602978a8e85f0f4209bf", size = 1641488 },
+    { url = "https://files.pythonhosted.org/packages/2b/e7/aa86b1a20e334408f43bec0fdffdd0abf23fc14f203ad14c63ccc2710864/deptry-0.21.1-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b5eae7afbcb9b7f6baa855b323e0da016a23f2a98d4b181dcfd2c71766512387", size = 1744129 },
+    { url = "https://files.pythonhosted.org/packages/43/5a/a597af2b3b6fbd1996c221ad776a891e54529fd0ba4a8c23879187e6e188/deptry-0.21.1-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4afef1c5eb0b48ebc31de2437b460df0363cb99722252b7faf7fa6f43e10cbcd", size = 1819837 },
+    { url = "https://files.pythonhosted.org/packages/31/6c/f26fd12717fbe4a56f208e236e03963d9c2e697288fe3163ac377a62ad45/deptry-0.21.1-cp39-abi3-win_amd64.whl", hash = "sha256:981a28e1feeaad82f07a6e3c8d7842c5f6eae3807dc13b24d453a20cd0a42a72", size = 1594523 },
+    { url = "https://files.pythonhosted.org/packages/a5/4f/c3e63c43c996c945ea79b3daa869b091b031f0e9f99e69c86bd9b85ba466/deptry-0.21.1-cp39-abi3-win_arm64.whl", hash = "sha256:98075550540c6b45f57abdfc453900bd2a179dc495d986ccc0757a813ee55103", size = 1517699 },
 ]
 
 [[package]]
@@ -715,6 +748,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-randomly"
+version = "3.16.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c0/68/d221ed7f4a2a49a664da721b8e87b52af6dd317af2a6cb51549cf17ac4b8/pytest_randomly-3.16.0.tar.gz", hash = "sha256:11bf4d23a26484de7860d82f726c0629837cf4064b79157bd18ec9d41d7feb26", size = 13367 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/22/70/b31577d7c46d8e2f9baccfed5067dd8475262a2331ffb0bfdf19361c9bde/pytest_randomly-3.16.0-py3-none-any.whl", hash = "sha256:8633d332635a1a0983d3bba19342196807f6afb17c3eef78e02c2f85dade45d6", size = 8396 },
+]
+
+[[package]]
 name = "python-discovery"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -794,6 +839,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ac/c3/e2a2b89f2d3e2179abd6d00ebd70bff6273f37fb3e0cc209f48b39d00cbf/requests-2.34.2.tar.gz", hash = "sha256:f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed", size = 142856 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl", hash = "sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0", size = 73075 },
+]
+
+[[package]]
+name = "requirements-parser"
+version = "0.13.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/89/1a/5f3c22d38bf1d87d1f4a961489d9eba35c4370a21395562d94410cdd0e73/requirements_parser-0.13.1.tar.gz", hash = "sha256:78811383b2089b6c5197a1431bc2c12ff950245edca39a23eea3460782038dd3", size = 22783 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bb/f9/15b44d5e4401b0013bbcefe3c09d7bfddcce28cc3d41b1d3077bcedf5b1f/requirements_parser-0.13.1-py3-none-any.whl", hash = "sha256:6e385663eb32589d16e5b22bb6e5251a57908e73803ffff438b53cd6ea2056e0", size = 14926 },
 ]
 
 [[package]]
