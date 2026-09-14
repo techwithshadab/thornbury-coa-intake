@@ -35,7 +35,7 @@ dev = [
     # The hygiene gate itself. Previously taken from whatever the machine happened to have, which
     # meant `make check` passed locally and failed on a clean runner -- the exact "green only where
     # the work was done" trap. A gate that decides pass/fail is a pinned input like any other.
-    "pre-commit==4.0.1",
+    "pre-commit==4.6.2",
     # F7: proves the suite is order-independent rather than asserting it. Randomises test order
     # every run, so a test that only passes because another ran first fails loudly.
     "pytest-randomly==3.16.0",
