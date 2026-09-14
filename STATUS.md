@@ -43,18 +43,21 @@ _Rules wired against SPEC-7 under `reference/policy.json`. On the 36 supplied do
   `make check` can never pass.
 
 ## Next
-The rulings in `docs/working-answers.md` are decided but **not implemented** — they are documented policy,
-not code. In order:
+The rulings in `docs/working-answers.md` are implemented, held as data in `reference/policy.json`.
+What remains is not code:
 
-- **Push to a remote and make `check` a required status check.** Closes the worst handover finding
-  (checklist 2.5: all code on one laptop) and turns an unrun workflow into an actual gate.
+- **A labelled evaluation set.** The one that matters. Without it no change to extraction or the
+  rules can be *measured*, only asserted — and `CLAUDE.md` names this as an invariant that does not
+  yet hold. **Every number this repo states about its own behaviour is arithmetic over 36 documents.**
 - **Have someone who did not build this read it.** Every ADR is self-signed and no PR has ever been
-  raised. Start them on `reference/policy.json` and ADR-0006.
+  raised. Start them on `reference/policy.json` and the ADR-0006/0008 pair — 0008 supersedes 0006 by
+  removing a rule whose threshold had been calibrated on the single case it admitted, which is the
+  shape of disagreement this repo expects.
+- **Make `check` a required status check.** CI runs and is green; branch protection is unset, so a
+  red run does not block a merge and `CODEOWNERS` is a text file rather than a gate. Settings are in
+  `docs/handover.md` §7.
 - **Send the notes** in `docs/questions-to-send.md` — Denis first; two of the others need names only
   Priya can give.
-- A labelled evaluation set. Without one, no change to extraction or the rules can be *measured*, only
-  asserted — and `CLAUDE.md` names this as an invariant that does not yet hold. **Every projected number
-  in `working-answers.md` is arithmetic over 36 documents, not a measurement.**
 
 ## Deliverables — where we actually stand
 The engagement asks for six things. A pre-build sweep on 2026-08-30 found **three missing entirely**,
@@ -64,14 +67,15 @@ which was a bigger gap than anything technical it turned up.
 |---|---|---|
 | 1 | A working slice | **done for the supplied corpus** — parser + rules green, 21/15 |
 | 2 | A deployment plan that actually works | **done** — [`docs/deployment.md`](docs/deployment.md), four stages, blockers named |
-| 3 | Decision records | **done** — ADR-0001…0007 |
+| 3 | Decision records | **done** — ADR-0001…0008, one superseding another after review |
 | 4 | A handover package | **done** — [`docs/handover.md`](docs/handover.md), scored against the engine checklist |
 | 5 | `decisions.jsonl` | **done** — `submissions/decisions.jsonl`, passes `validate_submission.py` |
 | 6 | A working log — how AI was used, incl. what it got wrong | **drafted** — [`docs/working-log.md`](docs/working-log.md); needs your sign-off on the judgements |
 
-All six now exist. **Two of the three "done" rows are producer-written and unaccepted** — the handover
-package self-reports two checklist items as FAILING (no remote, and setup never tested by anyone but
-its author), and the working log is drafted by the tool it reports on, which it says at the top.
+All six now exist. **They remain producer-written and unaccepted.** The handover package still
+reports its own gap plainly — no human other than the author has followed the README, which is the
+one checklist item that cannot be self-certified — and the working log is drafted by the tool it
+reports on, which it says at the top.
 
 ## Not built, deliberately — with the reason
 - **OCR.** Out of scope per the engagement brief. The seam is `extraction.Extractor`; the one
@@ -104,7 +108,8 @@ of "a handful a month" out of ~1,600.
 **We are not waiting on them.** [`docs/working-answers.md`](docs/working-answers.md) records a
 provisional, reversible ruling for each — what we build on, the business reason, what it costs if wrong,
 and who overturns it. Three were architectural enough to become ADRs (0004 release stance, 0005 hold
-routing, 0006 date ladder). Three we still decline to make; they are listed there too.
+routing, 0006 date ladder — since superseded by 0008). Three we still decline to make; they are
+listed there too.
 
 ## Risks / blockers
 - **No evaluation set** — solutioner. Every quality claim about this system is currently unfalsifiable.
@@ -114,6 +119,10 @@ routing, 0006 date ladder). Three we still decline to make; they are listed ther
   is a feed, which needs an owner.
 - **`criticality: regulated` with no Bar B gate green** — solutioner. See below; this is expected at this
   stage but must not be mistaken for readiness.
+- **Nobody but the author has read a line of this** — solutioner. No PR has ever been raised, every
+  ADR is self-signed, and `reviews/2026-08-29-conformance.md` is explicitly marked self-assessed and
+  unaccepted. The engine's axiom is that the *receiver* accepts. No receiver has. No gate added to
+  this repo changes that, and several have been.
 
 ## Go-live backlog (Bar B — not started, not pretended)
 `deployed` and `stateful` are false today. They become true when this runs as a service. Per surface:
