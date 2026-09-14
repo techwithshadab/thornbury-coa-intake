@@ -29,20 +29,20 @@ coa-intake = "coa_intake.cli:main"
 
 [project.optional-dependencies]
 dev = [
-    "ruff==0.16.1",       # MUST equal .pre-commit-config.yaml rev
+    "ruff==0.16.7",       # MUST equal .pre-commit-config.yaml rev
     "pytest==9.1.1",   # 8.3.4 carries PYSEC-2026-1845; caught by `make audit`
-    "pip-audit==2.7.3",   # the CVE gate in `make audit`
+    "pip-audit==2.10.1",   # the CVE gate in `make audit`
     # The hygiene gate itself. Previously taken from whatever the machine happened to have, which
     # meant `make check` passed locally and failed on a clean runner -- the exact "green only where
     # the work was done" trap. A gate that decides pass/fail is a pinned input like any other.
-    "pre-commit==4.0.1",
+    "pre-commit==4.6.2",
     # F7: proves the suite is order-independent rather than asserting it. Randomises test order
     # every run, so a test that only passes because another ran first fails loudly.
     "pytest-randomly==3.16.0",
     # F8: unused declared deps and undeclared imports. Both rot quietly.
-    "deptry==0.21.1",
+    "deptry==0.25.1",
     # F1: the layer directions were declared in docs and enforced by nothing.
-    "import-linter==2.1",
+    "import-linter==2.15",
 ]
 
 [tool.setuptools.packages.find]
