@@ -29,7 +29,7 @@ coa-intake = "coa_intake.cli:main"
 
 [project.optional-dependencies]
 dev = [
-    "ruff==0.16.1",       # MUST equal .pre-commit-config.yaml rev
+    "ruff==0.16.7",       # MUST equal .pre-commit-config.yaml rev
     "pytest==9.1.1",   # 8.3.4 carries PYSEC-2026-1845; caught by `make audit`
     "pip-audit==2.7.3",   # the CVE gate in `make audit`
     # The hygiene gate itself. Previously taken from whatever the machine happened to have, which
