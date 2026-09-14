@@ -7,7 +7,12 @@ engagement_id: SOW-2026-CAP-01
 slug: thornbury-coa-intake
 workstream_id: []                       # born at gate-in; one engagement -> N workstreams
 archetype: B                              # delivery archetype (A | B)
-data_classification: confidential
+# Was `confidential` while this repository is PUBLIC — a manifest cannot assert a classification the
+# hosting contradicts. Set to `internal` because the engagement is a training simulation: Thornbury
+# Ingredients, SPEC-7 and every named person are fictional, so nothing here is client-confidential in
+# fact. On a real engagement with these contents this repository would be private and this field
+# would read `confidential`.
+data_classification: internal
 owners:
   pm: TBD
   tl: TBD

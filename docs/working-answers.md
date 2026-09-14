@@ -1,5 +1,10 @@
 # Working answers — the provisional rulings we are building on
 
+> **INTERNAL working document.** Our reasoning about decisions that are Thornbury's to make, written
+> in our own voice including where we think we might be wrong. The client-facing version of this is
+> §3 of [`handover.md`](handover.md), which states the rulings and their owners without the
+> deliberation. Both should exist; only one is addressed to them.
+
 > Companion to [`open-questions.md`](open-questions.md). That file says what we cannot decide alone.
 > This one says **what we are doing in the meantime, why, and what it costs if we are wrong.**
 >

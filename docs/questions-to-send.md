@@ -1,5 +1,14 @@
 # Questions to send — five notes, one per stakeholder
 
+> ⚠️ **INTERNAL — do not share with the client.** This file contains stakeholder-handling strategy:
+> who to approach first and why, who should not be contacted cold, and how each note is pitched. That
+> reasoning is legitimate and necessary, and it is not written to be read by the people it describes.
+> On a real engagement this file stays inside the delivery team; the *notes themselves* are what goes
+> out, pasted into email, without the routing commentary above them.
+>
+> It is in a public repository here because Thornbury and everyone named are fictional — this is a
+> training engagement. The classification would be real otherwise, and the habit should be.
+
 Drafts of the questions in [`open-questions.md`](open-questions.md), written to be sent. Each note is
 short on purpose: a stakeholder who gets eight questions answers none, and the register has twenty-one.
 What is left out of a note is not dropped — it is waiting behind something else.
@@ -48,14 +57,22 @@ one wrongly is a recall conversation — roughly how many unnecessary holds woul
 wrong release? Ten? A hundred? A rough figure is genuinely useful; it's the setting that decides how
 cautious the system is, and I'd rather have your instinct than my guess.
 
-**2. Can I read a supplier's date convention off their other certificates?**
-Four certificates have a date like `07/02/2026` that could be July 2nd or February 7th. For Halewood I
-can resolve it — their other certificates use `15/03`, `25/10`, `27/12`, so they clearly write
-day/month, which makes that one 7 February. For Zeeland Bulk I can't: both of their ambiguous dates have
-no other Zeeland certificate to compare against.
+**2. Should I read a supplier's date convention off their other certificates?**
+Four certificates have a date like `07/02/2026` that could be July 2nd or February 7th. One of them
+solves itself — Perrin & Co print "all dates are written day/month/year" on the document, so reading
+that is just reading. The other three don't.
 
-Is reading it off their past paperwork something you'd be comfortable with, or does a date that reads
-two ways always go to a person? Both are defensible. It's your call, not mine.
+I could resolve one more. Halewood's other certificates use `15/03`, `25/10`, `27/12`, so they clearly
+write day/month, which would make `07/02/2026` the 7th of February. **I built that, then took it back
+out.** For Zeeland Bulk there's nothing to compare against at all, so those two hold — and once I was
+holding Zeeland's on the grounds that inferring from indirect evidence isn't safe enough, resolving
+Halewood's the same way stopped being defensible. The only thing separating them was a threshold I'd
+picked myself.
+
+So right now all three hold and go back to your team to key. That costs you three lots in thirty-six.
+Would you rather I used the supplier's own history where there's enough of it? It's your call, not
+mine — and if you say yes I'd want to agree how much history counts as enough, rather than picking a
+number again.
 
 **3. Two certificates disagree with themselves about the lot number.**
 COA-0018 has `HLW-1185` in the header and `HLW-1191` over the results; COA-0023 has `SRE-6803` and

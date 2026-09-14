@@ -1,5 +1,9 @@
 # Working log — how AI was used on this build
 
+> **INTERNAL — for assessment, not for the client.** An account of how AI was used on this build and
+> what it got wrong. Thornbury has no stake in it; an assessor does. It would not be part of a real
+> client handover.
+
 > Deliverable 6. The brief asks for an account of where AI acted as a thought partner, where it was
 > used to learn an unfamiliar domain, and where it executed work that was then verified — plus at
 > least one thing it got wrong or that was overruled.

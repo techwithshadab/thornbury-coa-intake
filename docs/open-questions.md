@@ -1,5 +1,11 @@
 # Open questions and stated assumptions
 
+> **INTERNAL working document.** The register behind the client-facing summary in
+> [`handover.md`](handover.md) §4. It records observations about how the engagement is running —
+> including our own misses — which belong in a delivery team's notes rather than in a client's inbox.
+>
+> ---
+>
 > The decisions that are **not ours to make**, who owns each one, and what we assumed in the meantime.
 >
 > Every question below is grounded in something in the 36-document sample or in what a named person
