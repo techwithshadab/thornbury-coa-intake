@@ -12,6 +12,13 @@ build-backend = "setuptools.build_meta"
 name = "coa-intake"
 version = "0.1.0"
 description = "Reads supplier Certificates of Analysis and decides, against SPEC-7, whether a lot is accepted or held for a human."
+# EOL policy (F2). The floor is 3.11 and the ceiling excludes 3.13 deliberately; `.python-version`
+# pins 3.12.5 exactly and `python-preference = "only-managed"` means uv downloads it rather than
+# adopting whatever the machine has. Upstream end-of-life: 3.11 → 2027-10, 3.12 → 2028-10.
+# The rule: move the floor before the floor version reaches EOL, never after. At `criticality:
+# regulated` a runtime past EOL stops receiving security fixes while still deciding whether lots
+# are acceptable, which is not a position to discover late. Next review due 2027-04 (six months
+# before 3.11 EOL), or sooner if a dependency requires it.
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "pydantic>=2,<3",     # the trust boundary (raw.py): strict models, extra='forbid'
@@ -34,6 +41,8 @@ dev = [
     "pytest-randomly==3.16.0",
     # F8: unused declared deps and undeclared imports. Both rot quietly.
     "deptry==0.21.1",
+    # F1: the layer directions were declared in docs and enforced by nothing.
+    "import-linter==2.1",
 ]
 
 [tool.setuptools.packages.find]
@@ -71,10 +80,40 @@ max-complexity = 10
 # CPython, so two clones get the identical interpreter.
 python-preference = "only-managed"
 
+[tool.importlinter]
+root_package = "coa_intake"
+
+# The declared architecture, enforced. Previously it lived in docs/architecture.md and the only
+# machine-checked boundary was the config one (by grep, in test_path_ownership). A layer direction
+# that nothing checks is a diagram, not an architecture.
+[[tool.importlinter.contracts]]
+name = "Layers run one way only"
+type = "layers"
+layers = [
+    # the entry point: knows about everything, and nothing knows about it
+    "coa_intake.cli",
+    # readers and rules: siblings, independent of each other. `app` holding the SPEC-7 rules must
+    # not depend on `parse` or `extraction` — how the text was READ cannot reach what is DECIDED,
+    # which is what keeps the rules testable without a document.
+    "coa_intake.app | coa_intake.parse | coa_intake.reference | coa_intake.extraction",
+    # the compiled rulings
+    "coa_intake.policy",
+    # the foundations: domain types, the trust boundary, the config boundary. Import nothing.
+    "coa_intake.domain | coa_intake.raw | coa_intake.paths",
+]
+
+[[tool.importlinter.contracts]]
+name = "The domain never reaches back across the trust boundary"
+type = "forbidden"
+source_modules = ["coa_intake.domain"]
+forbidden_modules = ["coa_intake.raw", "coa_intake.policy", "coa_intake.parse"]
+# domain.py holds what the runtime walks AFTER validation. If it could see raw.py, "validated" would
+# stop meaning anything — the compile step could be skipped and nobody would notice.
+
 [tool.deptry.per_rule_ignores]
 # DEP002 is "declared but never imported". These six are declared because the Makefile EXECUTES
 # them — they are the gate, not libraries the code calls. That is a legitimate way to depend on
 # something, and pinning them is required by the universal core: a tool that decides pass/fail is a
 # pinned input. Note what is NOT listed: `pydantic`, the only real runtime dependency, which deptry
 # correctly finds imported. If a genuinely unused library is ever added, this list will not hide it.
-DEP002 = ["ruff", "pytest", "pytest-randomly", "pip-audit", "pre-commit", "deptry"]
+DEP002 = ["ruff", "pytest", "pytest-randomly", "pip-audit", "pre-commit", "deptry", "import-linter"]

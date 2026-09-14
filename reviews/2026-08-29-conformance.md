@@ -49,12 +49,12 @@ be read as an attestation.
 ### Findings (partial — open)
 | # | Line | What is missing |
 |---|---|---|
-| F1 | Declared boundaries **enforced** | The layer directions are written in `docs/overview.md`; only the config boundary is machine-enforced (by grep, in `test_path_ownership`). No import-linter/cycle check holds `cli → app → domain ← raw`. |
-| F2 | Exact runtime pin **+ EOL policy** | The pin is exact and now genuinely reproducible (`.python-version` 3.12.5 + `python-preference = "only-managed"`). The EOL note mapping the supported range to upstream dates is not written. |
+| ~~F1~~ | ~~Declared boundaries enforced~~ | **CLOSED 2026-09-14.** `import-linter` in `make check` as `make boundaries`. Two contracts: a four-layer ordering, and a forbidden contract stopping `domain` from importing `raw`/`policy`/`parse`. **Watched to fail** — injecting `domain → raw` breaks both. |
+| ~~F2~~ | ~~Exact runtime pin + EOL policy~~ | **CLOSED 2026-09-14.** Policy written into `pyproject.toml` beside the pin it governs: 3.11 EOL 2027-10, 3.12 EOL 2028-10, move the floor *before* EOL not after, next review 2027-04. |
 | F3 | Owned command in **required** CI | **Half closed 2026-09-14.** The remote exists, CI runs `make check` and is green, and it now also gates that the committed submission reproduces. Still **not a required status check** — branch protection is unset, so a red run does not block a merge. |
-| F4 | Dependency **license** gate | The CVE half is present and was *watched to work*: it caught `pytest==8.3.4` / PYSEC-2026-1845 on the first run and the pin was bumped. There is no license deny-list. |
-| F5 | Pins do not fossilize | No dependency-update bot configured. |
-| F6 | Supply-chain hygiene | Actions are SHA-pinned with `contents: read`; no SBOM is generated or retained. |
+| F4 | Dependency **license** gate | **Open — deliberately, as an accepted cost.** The CVE half is present and was *watched to work* (caught `pytest==8.3.4` / PYSEC-2026-1845 on its first run). The license half is not, and we are choosing not to add it: the runtime surface is **one** dependency, `pydantic` (MIT). A deny-list over a single permissive library adds a pinned tool and a gate that cannot fire, and a gate that never fires is weight without signal. **Revisit the moment a second runtime dependency is added** — that is the trigger, not a date. |
+| ~~F5~~ | ~~Pins do not fossilize~~ | **CLOSED 2026-09-14.** `.github/dependabot.yml` — monthly for uv, github-actions and pre-commit. Notes that a `ruff` bump must move `pyproject.toml` and the pre-commit `rev:` in the same commit, or the two fight and `make check` can never pass. |
+| F6 | Supply-chain hygiene | **Partly open — deliberately.** Actions are SHA-pinned with `contents: read`, and `uv.lock` is a hash-pinned, fully-resolved manifest that already answers what an SBOM is usually asked. Generating a CycloneDX artifact per build is not worth another pinned tool at one runtime dependency and no deployment. **Becomes worth doing at deployment stage 2**, when something is actually shipped and an SBOM has a consumer. |
 | ~~F7~~ | ~~Hermetic, order-independent tests~~ | **CLOSED 2026-09-14.** `pytest-randomly` pinned; every run randomises order, so a test that only passes because another ran first fails loudly. 146 tests green. Network-disabled still unproven, but the suite makes no network calls. |
 | ~~F8~~ | ~~Dead-code + dependency hygiene~~ | **CLOSED 2026-09-14.** `deptry` pinned and in `make check` as `make deps`. The six DEP002 ignores are tools the Makefile *executes* rather than imports, listed explicitly with reasoning; `pydantic` is correctly detected as used, so the check is live. |
 | F9 | Runnable docs | README commands are not executed by a test, so a stale example would not break the build. |
@@ -99,10 +99,17 @@ and no CI check failing a breaking change without a version bump.
 > widened twice after it was found passing over unfilled template text. Test count 32 → 62.
 > **F1–F9, F11, F12 remain open and unchanged.**
 
-> **Re-scored again 2026-09-14.** F7 and F8 **closed**. F3 **half closed** — CI runs and is green;
-> branch protection is the remainder. F10 was closed on 2026-08-30. **F1, F2, F4, F5, F6, F9, F11 and
-> F12 remain open**, and F11 (no evaluation set) is still the one that matters most: every number this
-> repo states about its own behaviour is arithmetic over 36 documents.
+> **Re-scored again 2026-09-14, twice.** Closed today: **F1** (import boundaries, watched to fail),
+> **F2** (EOL policy), **F5** (dependabot), **F7** (randomised test order), **F8** (dependency
+> hygiene). F10 closed 2026-08-30. **F3 half closed** — CI runs, is green, and now gates that the
+> committed submission reproduces; branch protection is the remainder and it is not ours to set.
+>
+> **F4 and F6 are open by decision, not by omission**, with the trigger that would reopen each
+> written in their rows. The rubric allows an explicitly accepted cost; these are two.
+>
+> **F9, F11 and F12 remain genuinely open.** F11 — no evaluation set — is still the one that matters:
+> every number this repo states about its own behaviour is arithmetic over 36 documents, and no gate
+> added today changes that.
 
 ## Conditions
 1. F3 and F11 before any quality claim is made about this system.
