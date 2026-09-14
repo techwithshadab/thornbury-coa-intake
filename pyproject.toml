@@ -42,7 +42,7 @@ dev = [
     # F8: unused declared deps and undeclared imports. Both rot quietly.
     "deptry==0.21.1",
     # F1: the layer directions were declared in docs and enforced by nothing.
-    "import-linter==2.1",
+    "import-linter==2.15",
 ]
 
 [tool.setuptools.packages.find]
