@@ -87,8 +87,14 @@ submission: ## Reproduce the three submitted runs from the vendored corpus
 	@uv run --frozen coa-intake --documents engagement/documents --reference reference \
 		--out submissions/decisions.jsonl
 	@uv run --frozen python engagement/validate_submission.py submissions/run-1/decisions.jsonl engagement/documents
-	@if [ "$$(md5 -q submissions/run-*/decisions.jsonl | sort -u | wc -l | tr -d ' ')" = "1" ]; then \
-		echo "✓ all three runs byte-identical"; else echo "✗ runs differ — determinism is broken"; exit 1; fi
+	@if cmp -s submissions/run-1/decisions.jsonl submissions/run-2/decisions.jsonl \
+	 && cmp -s submissions/run-2/decisions.jsonl submissions/run-3/decisions.jsonl; then \
+		echo "✓ all three runs byte-identical"; \
+	else echo "✗ runs differ — determinism is broken"; exit 1; fi
+# `cmp`, not `md5`: `md5` is macOS-only and `md5sum` is the Linux spelling. The first version used
+# `md5 -q`, which does not exist on the CI runner, so the comparison produced nothing and the check
+# reported "determinism is broken" when determinism was fine and the CHECK was broken. A gate that
+# fails for its own reasons teaches people to ignore it. `cmp` is POSIX and needs no hash tool.
 # The path is passed EXPLICITLY here, and that is the point: the Makefile knowing where the corpus
 # lives is not the same as the program knowing. `coa-intake` has no default documents path and
 # tests/test_no_hardcoded_corpus.py fails if one appears.
