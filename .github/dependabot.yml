@@ -1,0 +1,32 @@
+# F5 — "pins don't fossilize". Every tool in this repo is pinned exactly, which is what stops
+# whatever released this week from silently becoming part of the gate. The cost of that discipline
+# is that pins rot: a pinned dependency is a decision not to upgrade, taken once and then forgotten.
+# This is the counterweight — the pins stay exact, and something proposes moving them on a schedule.
+#
+# Note `ruff` in particular: its version must stay identical to the `rev:` in
+# .pre-commit-config.yaml, or the hook and the project's own `ruff format --check` rewrite the same
+# file against each other and `make check` can never pass. A ruff bump therefore needs BOTH updated
+# in the same commit. Dependabot will open them separately; merge them together.
+version: 2
+updates:
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore(ci)"
+
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore(hooks)"
