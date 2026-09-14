@@ -73,6 +73,7 @@ reference/
 tests/            the suite, incl. the invariant tests
 docs/
   overview.md         this file
+  architecture.md     the runtime path and the data provenance, as diagrams
   open-questions.md   what is NOT ours to decide, by owner, + the assumptions we run on
   working-answers.md  the provisional ruling on each, and what it costs if wrong
   questions-to-send.md  those questions drafted as notes, one per stakeholder
@@ -94,6 +95,7 @@ REPO-SURFACE.yaml what this repo is (the router for the repo-fitness bar)
 - **How this reaches production → [`docs/deployment.md`](deployment.md)**
 - **What a receiving team inherits → [`docs/handover.md`](handover.md)**
 - How AI was used, and what it got wrong → [`docs/working-log.md`](working-log.md)
+- **The mechanism, with diagrams → [`docs/architecture.md`](architecture.md)**
 - Engineering contract & invariants → `CLAUDE.md`
 - Repo standards & branch protection → `CONVENTIONS.md`
 - How-it-works-today → `docs/reference/`

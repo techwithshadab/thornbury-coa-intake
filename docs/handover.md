@@ -80,7 +80,7 @@ the vocabulary (two of this engagement's hardest questions are vocabulary disput
 | # | Item | Status | Evidence / gap |
 |---|---|---|---|
 | 1.1 | Charter and success criteria current | **Complete** | `docs/overview.md`; the engagement brief |
-| 1.2 | Current-state architecture documented | **Complete, no diagram** | `docs/overview.md` carries the shape and the full boundary inventory. **No diagram exists** — the checklist asks for one |
+| 1.2 | Current-state architecture documented | **Complete** | `docs/architecture.md` — the runtime path and the derived-vs-hand-authored data provenance, both as Mermaid (GitHub renders natively), plus the boundary table. `docs/overview.md` carries the shape |
 | 1.3 | Non-obvious decisions captured | **Complete** | ADR-0001…0007, each with context, consequences and options |
 | 1.4 | Alternatives not chosen, with reasoning | **Complete** | Every ADR carries an "Options considered" section naming what was rejected and why |
 | 1.5 | Confluence pages exist | **N/A / not started** | No Confluence space for this engagement |

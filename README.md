@@ -45,12 +45,28 @@ boundaries with other systems. For deeper detail, link to /docs/architecture.md.
 -->
 
 ```mermaid
-graph LR
-  A[Source System] --> B[This Repo]
-  B --> C[Downstream Consumer]
+flowchart LR
+    DOCS[/"certificates<br/><i>runtime input</i>"/] --> PARSE["parse.py<br/>labelled patterns<br/><b>no match ⇒ absent</b>"]
+    REF[/"reference/<br/>spec · master · policy"/] --> DECIDE
+    PARSE --> DECIDE{{"decide()<br/>SPEC-7 rules"}}
+    DECIDE --> ACC["<b>accept</b> + fields"]
+    DECIDE --> HOLD["<b>hold</b> + reason + route"]
+    ACC --> OUT[/decisions.jsonl/]
+    HOLD --> OUT
+    OUT --> HUMAN(["a person reviews<br/>and releases"])
+    HUMAN -.-> ERP[("ERP<br/><i>never called<br/>by this system</i>")]
+
+    style DECIDE fill:#2B004D,color:#fff
+    style ERP stroke-dasharray: 4 4
 ```
 
-For full architecture detail, see [`/docs/architecture.md`](docs/architecture.md).
+Two properties do most of the work. An unrecognised layout yields **nothing** and the lot holds — it
+never yields a plausible wrong number ([ADR-0007](decisions/0007-parse-deterministically-and-hold-what-we-cannot-read.md)).
+And the system **never releases a lot**: it writes a file, a person releases, exactly as today
+([ADR-0004](decisions/0004-the-system-never-releases-a-lot.md)).
+
+For full architecture detail — the trust boundaries, and which reference data is derived versus
+hand-authored — see [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
