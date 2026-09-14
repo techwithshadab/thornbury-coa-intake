@@ -1,0 +1,19 @@
+ANALYTICAL REPORT
+Sample ref: BRM-8779
+
+Parameter         Found             Limits              Technique
+----------------  ----------------  ------------------  ------------------------------
+Assay             100.555 %         99.0 to 101.0       HPLC (SPEC-7 M-01)
+Moisture          0.106 %           0.0 to 0.5          Karl Fischer (SPEC-7 M-04)
+Heavy Metals      5.817 ppm         0.0 to 10.0         ICP-MS (SPEC-7 M-11)
+Bulk Density      0.597 g/mL        0.45 to 0.75        USP <616> (SPEC-7 M-21)
+
+------------------------------------------------------------
+
+Batch ref .......... BRM-8779
+Article ............ Citric Acid Anhydrous (CIT-100)
+Produced ........... 06/22/2026
+Re-test by ......... 06/22/2028
+
+Issued by Brightmoor Botanicals.
+All results conform unless stated.

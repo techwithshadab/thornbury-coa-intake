@@ -1,0 +1,19 @@
+ZEELAND BULK BV
+CERTIFICATE OF ANALYSIS
+
+Product:            Ascorbic Acid USP
+Material No:        ASC-220
+Lot Number:         ZLB-7740
+Date of Manufacture:  02/08/2026
+Retest Date:        02/08/2028
+
+RESULTS  (lot ZLB-7740)
+
+Test              Method                          Specification     Result
+----------------  ------------------------------  ----------------  ----------------  ------
+Assay             HPLC (SPEC-7 M-01)              99.0-101.0        99.699 %          PASS
+Moisture          Karl Fischer (SPEC-7 M-04)      0.0-0.5           0.114 %           PASS
+Heavy Metals      ICP-MS (SPEC-7 M-11)            0.0-10.0          3.692 ppm         PASS
+Bulk Density      USP <616> (SPEC-7 M-21)         0.45-0.75         0.606 g/mL        PASS
+
+Approved by Quality Assurance.

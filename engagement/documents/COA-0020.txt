@@ -1,0 +1,20 @@
+C E R T I F I C A T E   O F   A N A L Y S I S
+
+  Aldergrove Mills
+
+  Item          : Xanthan Gum 80 Mesh
+  Item code     : XAN-080
+  Batch         : ALD-4597
+  Mfg date      : 19 Oct 2026
+  Retest due    : 19 Oct 2028
+
+  Results (batch ALD-4597):
+
+  Assay         : 99.563 %   [99.0-101.0]  PASS
+                  via HPLC (SPEC-7 M-01)
+  Moisture      : 0.249 %   [0.0-0.5]  PASS
+                  via Karl Fischer (SPEC-7 M-04)
+  Heavy Metals  : 7.023 ppm   [0.0-10.0]  PASS
+                  via ICP-MS (SPEC-7 M-11)
+  Bulk Density  : 0.663 g/mL   [0.45-0.75]  PASS
+                  via USP <616> (SPEC-7 M-21)

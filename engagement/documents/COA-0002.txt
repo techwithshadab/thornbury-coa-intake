@@ -1,0 +1,19 @@
+Aldergrove Mills
+
+This document certifies that the material described below has been
+analysed in accordance with the applicable specification.
+
+Description ....... Malic Acid Fine
+Reference ......... MAL-505
+Identification .... ALD-2655
+Manufactured ...... 2026-01-27
+Valid until ....... 2028-01-27
+
+Analysis of identification ALD-2655:
+
+Determination     Requirement           Obtained          Procedure
+----------------  --------------------  ----------------  ------------------------------
+Assay             99.0-101.0 %          100.356 %         HPLC (SPEC-7 M-01)
+Moisture          0.0-0.5 %             0.153 %           Karl Fischer (SPEC-7 M-04)
+Heavy Metals      0.0-10.0 ppm          5.356 ppm         ICP-MS (SPEC-7 M-11)
+Bulk Density      0.45-0.75 g/mL        0.591 g/mL        USP <616> (SPEC-7 M-21)

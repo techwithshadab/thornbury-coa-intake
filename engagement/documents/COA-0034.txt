@@ -1,0 +1,14 @@
+|SUPPLIER|Perrin & Co
+|PRODUCT|Sodium Citrate Dihydrate|SCD-315
+
+Issued from our Rotterdam facility. All dates are written day/month/year.
+|LOT|PRC-9819
+|MFGDATE|01/10/2026
+|RETESTDATE|01/10/2028
+|LOTREF|PRC-9819
+|BEGIN RESULTS|
+|R|Assay|100.019|%|99.0|101.0|HPLC (SPEC-7 M-01)|PASS
+|R|Moisture|0.22|%|0.0|0.5|Karl Fischer (SPEC-7 M-04)|PASS
+|R|Heavy Metals|6.806|ppm|0.0|10.0|ICP-MS (SPEC-7 M-11)|PASS
+|R|Bulk Density|0.611|g/mL|0.45|0.75|USP <616> (SPEC-7 M-21)|PASS
+|END RESULTS|

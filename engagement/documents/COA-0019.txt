@@ -1,0 +1,18 @@
+HALEWOOD INGREDIENTS
+CERTIFICATE OF ANALYSIS
+
+Product:            Xanthan Gum 80 Mesh
+Material No:        XAN-080
+Lot Number:         HLW-4956
+Date of Manufacture: 21 Jun 2026
+
+RESULTS  (lot HLW-4956)
+
+Test              Method                          Specification     Result
+----------------  ------------------------------  ----------------  ----------------  ------
+Assay             HPLC (SPEC-7 M-01)              99.0-101.0        99.638 %          PASS
+Moisture          Karl Fischer (SPEC-7 M-04)      0.0-0.5           0.229 %           PASS
+Heavy Metals      ICP-MS (SPEC-7 M-11)            0.0-10.0          6.836 ppm         PASS
+Bulk Density      USP <616> (SPEC-7 M-21)         0.45-0.75         0.675 g/mL        PASS
+
+Approved by Quality Assurance.

@@ -1,0 +1,20 @@
+C E R T I F I C A T E   O F   A N A L Y S I S
+
+  Halewood Ingredients
+
+  Item          : Guar Gum Powder
+  Item code     : GUA-410
+  Batch         : HLW-9520
+  Mfg date      : 15/03/2026
+  Retest due    : 15/03/2028
+
+  Results (batch HLW-9520):
+
+  Assay         : 101.366 %   [99.0-101.0]  PASS
+                  via HPLC (SPEC-7 M-01)
+  Moisture      : 0.296 %   [0.0-0.5]  PASS
+                  via Karl Fischer (SPEC-7 M-04)
+  Heavy Metals  : 5.695 ppm   [0.0-10.0]  PASS
+                  via ICP-MS (SPEC-7 M-11)
+  Bulk Density  : 0.523 g/mL   [0.45-0.75]  PASS
+                  via USP <616> (SPEC-7 M-21)

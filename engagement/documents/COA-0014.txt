@@ -1,0 +1,19 @@
+Kestrel Fine Chemicals
+
+This document certifies that the material described below has been
+analysed in accordance with the applicable specification.
+
+Description ....... Guar Gum Powder
+Reference ......... GUA-410
+Identification .... KFC-6764
+Manufactured ...... 02/28/2026
+Valid until ....... 02/28/2028
+
+Analysis of identification KFC-6764:
+
+Determination     Requirement           Obtained          Procedure
+----------------  --------------------  ----------------  ------------------------------
+Assay             99.0-101.0 %          100.481 %         HPLC (SPEC-7 M-01)
+Moisture          0.0-0.5 %             0.361 %           Karl Fischer (SPEC-7 M-04)
+Heavy Metals      0.0-10.0 ppm          4.503 ppm         ICP-MS (SPEC-7 M-11)
+Bulk Density      0.45-0.75 g/mL        0.652 g/mL        USP <616> (SPEC-7 M-21)

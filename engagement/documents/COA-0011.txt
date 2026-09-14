@@ -1,0 +1,35 @@
+Kestrel Fine Chemicals — Certificate of Analysis
+====================================================
+
+LOT: KFC-6933
+PRODUCT: Citric Acid Anhydrous
+CODE: CIT-100
+MFG: 23 Mar 2026
+RETEST: 23 Mar 2028
+
+-- Test results for lot KFC-6933 --
+
+Assay:
+    result = 100.188 %
+    spec   = 99.0 .. 101.0 %
+    method = HPLC (SPEC-7 M-01)
+    status = PASS
+
+Moisture:
+    result = 0.307 %
+    spec   = 0.0 .. 0.5 %
+    method = Karl Fischer (SPEC-7 M-04)
+    status = PASS
+
+Heavy Metals:
+    result = 5.507 ppm
+    spec   = 0.0 .. 10.0 ppm
+    method = ICP-MS (SPEC-7 M-11)
+    status = PASS
+
+Bulk Density:
+    result = 0.535 g/mL
+    spec   = 0.45 .. 0.75 g/mL
+    method = USP <616> (SPEC-7 M-21)
+    status = PASS
+
