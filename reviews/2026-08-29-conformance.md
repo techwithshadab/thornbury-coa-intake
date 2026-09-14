@@ -51,12 +51,12 @@ be read as an attestation.
 |---|---|---|
 | F1 | Declared boundaries **enforced** | The layer directions are written in `docs/overview.md`; only the config boundary is machine-enforced (by grep, in `test_path_ownership`). No import-linter/cycle check holds `cli → app → domain ← raw`. |
 | F2 | Exact runtime pin **+ EOL policy** | The pin is exact and now genuinely reproducible (`.python-version` 3.12.5 + `python-preference = "only-managed"`). The EOL note mapping the supported range to upstream dates is not written. |
-| F3 | Owned command in **required** CI | `.github/workflows/check.yml` runs `make check` on every PR, but there is no remote and no branch protection, so "required" is unproven. A CI job that does not block merge is a notification. |
+| F3 | Owned command in **required** CI | **Half closed 2026-09-14.** The remote exists, CI runs `make check` and is green, and it now also gates that the committed submission reproduces. Still **not a required status check** — branch protection is unset, so a red run does not block a merge. |
 | F4 | Dependency **license** gate | The CVE half is present and was *watched to work*: it caught `pytest==8.3.4` / PYSEC-2026-1845 on the first run and the pin was bumped. There is no license deny-list. |
 | F5 | Pins do not fossilize | No dependency-update bot configured. |
 | F6 | Supply-chain hygiene | Actions are SHA-pinned with `contents: read`; no SBOM is generated or retained. |
-| F7 | Hermetic, **order-independent** tests | The suite makes no network calls, but has not been run network-disabled or in randomized order (no `pytest-randomly`). Order-independence is asserted, not demonstrated. |
-| F8 | Dead-code + dependency hygiene | No dead-code finder and no `deptry`-equivalent in the ritual. |
+| ~~F7~~ | ~~Hermetic, order-independent tests~~ | **CLOSED 2026-09-14.** `pytest-randomly` pinned; every run randomises order, so a test that only passes because another ran first fails loudly. 146 tests green. Network-disabled still unproven, but the suite makes no network calls. |
+| ~~F8~~ | ~~Dead-code + dependency hygiene~~ | **CLOSED 2026-09-14.** `deptry` pinned and in `make check` as `make deps`. The six DEP002 ignores are tools the Makefile *executes* rather than imports, listed explicitly with reasoning; `pydantic` is correctly detected as used, so the check is live. |
 | F9 | Runnable docs | README commands are not executed by a test, so a stale example would not break the build. |
 
 ## Conditional packs
@@ -99,9 +99,14 @@ and no CI check failing a breaking change without a version bump.
 > widened twice after it was found passing over unfilled template text. Test count 32 → 62.
 > **F1–F9, F11, F12 remain open and unchanged.**
 
+> **Re-scored again 2026-09-14.** F7 and F8 **closed**. F3 **half closed** — CI runs and is green;
+> branch protection is the remainder. F10 was closed on 2026-08-30. **F1, F2, F4, F5, F6, F9, F11 and
+> F12 remain open**, and F11 (no evaluation set) is still the one that matters most: every number this
+> repo states about its own behaviour is arithmetic over 36 documents.
+
 ## Conditions
 1. F3 and F11 before any quality claim is made about this system.
-2. F1, F7, F8 before the decision rules land — they are cheap now and get expensive later.
+2. ~~F1, F7, F8 before the decision rules land~~ — F7 and F8 closed; F1 (import-boundary check) open.
 3. This record is **not accepted** until signed by a reviewer who did not build the repo.
 
 ## Follow-ups

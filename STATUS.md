@@ -2,8 +2,8 @@
 status: amber                 # green | amber | red
 milestone_current: working slice
 milestone_position: on-track  # on-track | ahead | behind
-updated: 2026-08-30
-next_milestone: decision rules against SPEC-7 — target TBD
+updated: 2026-09-14
+next_milestone: a labelled evaluation set — target TBD
 ---
 
 <!--
@@ -18,14 +18,20 @@ _Rules wired against SPEC-7 under `reference/policy.json`. On the 36 supplied do
 15 hold. No labelled set yet, so that split is arithmetic, not a measurement._
 
 ## Now
-- **Milestone:** working slice — **on-track**. Deterministic parser (ADR-0007) and the SPEC-7 rules
-  are wired, with every ruling held as reviewed data in `reference/policy.json`. `make check` is green
-  with no skips, and a clean clone reproduces `submissions/decisions.jsonl` byte-for-byte.
+- **Milestone:** working slice — **on-track**. All six deliverables exist. Deterministic parser
+  (ADR-0007) and the SPEC-7 rules are wired, every ruling held as reviewed data in
+  `reference/policy.json`. **146 tests**, `make check` green with no skips.
+- **Public, and CI is green.** `github.com/techwithshadab/thornbury-coa-intake`. A clone taken from
+  GitHub — not from this machine — runs `make setup && make check && make submission` and reproduces
+  the committed output byte-for-byte. CI now gates that reproduction on every push.
+- **The engagement materials are vendored** at `engagement/`, so the repo is one thing to clone. The
+  corpus stays a runtime *input*: `--documents` is required and `tests/test_no_hardcoded_corpus.py`
+  fails if any file under `src/` or `tools/` names `engagement/`.
 - **The split matches the hand analysis exactly** — 21/15, document for document, predicted in
   `docs/working-answers.md` before the code existed. That is a consistency check between two
   independent routes to the same answer. **It is not evidence the answers are right**: both routes are
   ours, and there is still no labelled set.
-- **Focus:** deliverables 2, 4 and 6 (deployment plan, handover package, working log) — all missing.
+- **Focus:** a labelled evaluation set, and a second human reading any of this.
 
 ## Next
 The rulings in `docs/working-answers.md` are decided but **not implemented** — they are documented policy,
