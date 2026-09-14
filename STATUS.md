@@ -32,12 +32,15 @@ _Rules wired against SPEC-7 under `reference/policy.json`. On the 36 supplied do
   independent routes to the same answer. **It is not evidence the answers are right**: both routes are
   ours, and there is still no labelled set.
 - **Focus:** a labelled evaluation set, and a second human reading any of this.
-- **Ten open Dependabot PRs, deliberately unmerged.** That is F5 working, not a backlog — it opened
-  them within minutes of being configured. They are not being merged immediately before submission:
-  ten dependency bumps at once is avoidable risk, and the pins are current enough that CI is green.
-  **Whoever merges them: `ruff` in `pyproject.toml` and the `rev:` in `.pre-commit-config.yaml` must
-  move in the SAME commit** (PRs #10 and #5). Merge either alone and the hook and the project's own
-  `ruff format --check` rewrite the same file against each other, and `make check` can never pass.
+- **The toolchain is current.** Dependabot opened ten PRs within minutes of being configured (F5
+  working) and all ten landed in one commit — none was obsolete, and two improved the gates
+  themselves: gitleaks 8.30.1 and pip-audit 2.10.1, the CVE gate that already caught a real finding
+  here. Verified after bumping, because a formatter bump is exactly what can move output:
+  `make submission` still reproduces byte-for-byte.
+  **Standing trap for whoever bumps `ruff` next:** it is pinned in `pyproject.toml` *and* as the
+  `rev:` in `.pre-commit-config.yaml`, deliberately. They must move in the same commit, or the hook
+  and the project's own `ruff format --check` rewrite the same file against each other and
+  `make check` can never pass.
 
 ## Next
 The rulings in `docs/working-answers.md` are decided but **not implemented** — they are documented policy,
