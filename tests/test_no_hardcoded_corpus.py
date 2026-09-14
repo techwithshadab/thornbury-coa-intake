@@ -66,3 +66,25 @@ def test_the_supplied_validator_is_present():
 def test_the_corpus_is_complete():
     """36 documents, as supplied. A short corpus would silently change every count in the docs."""
     assert len(list((ENGAGEMENT / "documents").glob("*.txt"))) == 36
+
+
+def test_the_hygiene_hooks_never_rewrite_the_supplied_material():
+    """Hooks that MODIFY a file must exclude `engagement/`; hooks that only DETECT must not.
+
+    Six of the supplied certificates end without a trailing newline, and `end-of-file-fixer` would
+    "fix" them — leaving us scored against a corpus that is not the one we were given, on exactly the
+    kind of whitespace a parser can turn on. Detection still covers the directory: we cannot fix what
+    is in there, but we should still know.
+    """
+    config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+    modifying = {"end-of-file-fixer", "trailing-whitespace", "mixed-line-ending"}
+    detecting = {"gitleaks", "detect-private-key", "check-added-large-files"}
+
+    for block in config.split("- id: ")[1:]:
+        hook_id = block.split("\n", 1)[0].strip()
+        # Look only at this hook's own lines, before the next hook or repo begins.
+        own = block[:200]
+        if hook_id in modifying:
+            assert "^engagement/" in own, f"{hook_id} may rewrite the supplied material"
+        if hook_id in detecting:
+            assert "^engagement/" not in own, f"{hook_id} must still scan the supplied material"

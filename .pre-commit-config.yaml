@@ -36,10 +36,13 @@ repos:
       - id: check-json
       - id: check-toml
       - id: end-of-file-fixer
+        exclude: '^engagement/'
       - id: trailing-whitespace
+        exclude: '^engagement/'
       - id: detect-private-key
       - id: check-case-conflict
       - id: mixed-line-ending
+        exclude: '^engagement/'
         args: ["--fix=lf"]
 
   # --- Secret scanning (catches credentials before they enter git history) ---
