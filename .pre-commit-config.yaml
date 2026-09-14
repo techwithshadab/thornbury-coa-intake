@@ -61,7 +61,7 @@ repos:
   # they disagreed about assert-message parenthesisation, on a file the pack itself ships.
   # On `pre-commit autoupdate`, bump the project's pin to match in the SAME commit.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.1
+    rev: v0.16.7
     hooks:
       - id: ruff
         args: [--fix]
