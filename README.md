@@ -301,7 +301,7 @@ operational facts here so a reader doesn't have to context-switch for the basics
 - **Logs:** the run prints to stdout/stderr; `decisions.jsonl` is the durable record of what was
   decided and why. There is no log aggregation because there is no service.
 - **On-call / support:** none. The solutioner of record (see `engine.yaml`) is the only contact, which
-  is itself a handover risk — see [`docs/handover.md`](docs/handover.md).
+  is itself a handover risk — stated plainly in [`docs/handover.md`](docs/handover.md) §5.
 - **Common operational tasks:** `make reference` after a SPEC-7 revision; `make freshness` to check
   the derived data is current; `make run` for a batch.
 

@@ -1,243 +1,153 @@
-# Handover package
+# Handover — Thornbury certificate-of-analysis intake
 
-> For a team that has never spoken to us. Read this first, then `docs/overview.md`.
->
-> Scored against the engine's `Handover_Readiness_Checklist.md` — the checklist's own rule is
-> **evidence, not assertion**: an item is done when you can point at the artifact, not when someone
-> remembers doing it. Every "done" below names the artifact. The gaps are listed as plainly as the
-> completions, because a handover package that reports itself green is the one nobody trusts.
+**From:** MathCo · **To:** Thornbury Ingredients · **Date:** 14 September 2026
 
-**Honest summary: this repo can be inherited and it now builds green somewhere that is not this
-laptop. It has still never been reviewed by a second human.** That is the remaining handover risk,
-and it is not fixed by writing more documentation.
+This document is written for Thornbury. It says what you are receiving, what it does and does not
+do, what it decided on your behalf while your questions were open, and what we need from you before
+it can go further. Where it reports a gap it reports it plainly — a handover that describes itself
+as finished is the one nobody should trust.
 
----
-
-## 1. The ninety-second version
-
-Thornbury Ingredients receives ~400 supplier Certificates of Analysis a week. Two people read them
-and key the values into the ERP. This repo reads the certificate instead and returns one of two
-answers per document: **accept**, with the fields, or **hold**, with a reason and a queue.
-
-The judgement is the product. A certificate can be wrong — a transposed lot number, a result outside
-specification with PASS printed over it — and catching that is the part that matters. Releasing a lot
-that should have been held is a recall conversation; holding one unnecessarily is a day of delay.
-
-**On the 36 supplied documents: 21 accept, 15 hold.** That is arithmetic over a small sample, not a
-measurement, and there is no labelled set to make it one.
+Your engineering colleagues will want `README.md` and `docs/architecture.md` as well. Everything
+here holds regardless of who reads it.
 
 ---
 
-## 2. What you are inheriting
+## 1. What this does
 
-| | |
-|---|---|
-| **Runs** | `make run DOCS=<dir> OUT=<file>` — a batch CLI. Nothing is deployed. |
-| **Prerequisites** | `git`, `make`, `uv`. The interpreter is uv-managed and pinned, so the machine's own Python is not a variable. |
-| **The gate** | `make check` — hygiene, size, placeholders, derived-data freshness, lint, 84 tests, CVE audit. Green with no skips. |
-| **Proven** | A clean clone reproduces `submissions/decisions.jsonl` byte-for-byte. Output passes the engagement's `validate_submission.py`. |
-| **Language** | Python 3.12.5, ~900 lines of source. No framework, no service, no database. |
+Your intake team receives around four hundred certificates of analysis a week and keys the values
+into the ERP by hand. This system reads the certificate instead and returns one of two answers for
+each document:
 
-### The five files that matter
+- **Accept** — the fields, ready for the lot record.
+- **Hold** — a reason written for the person who has to act on it, and the desk it belongs on.
 
-1. **`reference/policy.json`** — every decision we made on Thornbury's behalf, as reviewed data with
-   a named owner per rule. **Start here.** If something is deciding wrongly, it is far more likely to
-   be a ruling you disagree with than a bug.
-2. **`src/coa_intake/app.py`** — the rules. Walks the spec and the policy; writes no rule of its own.
-3. **`src/coa_intake/parse.py`** — deterministic text → `Certificate`. No match means *absent*.
-4. **`docs/working-answers.md`** — why each ruling is what it is, and what it costs if wrong.
-5. **`docs/open-questions.md`** — the 21 things that are not ours to decide, by owner.
+**Over the thirty-six certificates you supplied: 21 accepted, 15 held.**
 
-Then, when you need them: [`runbook.md`](runbook.md) to operate it, [`glossary.md`](glossary.md) for
-the vocabulary (two of this engagement's hardest questions are vocabulary disputes), and
-[`deployment.md`](deployment.md) for how it reaches production.
+The judgement is the point, not the typing. Denis Achebe's framing shaped the whole design:
+releasing a lot that should have been held is a recall conversation with a customer; holding one
+unnecessarily is an annoyed supplier and a day of delay. Both are bad, and they are not the same
+kind of bad.
 
-### Where the bodies are buried
+**Please do not read 21/15 as an accuracy figure.** It is arithmetic over thirty-six documents. No
+evaluation set exists, so nothing here is a measured quality claim — see §5.
 
-- **The parser is deliberately brittle in one direction.** An unrecognised layout yields nothing and
-  the lot holds. That is ADR-0007, not a defect. **Do not add a best-effort fallback** — it converts
-  the safe failure into the dangerous one and undoes the basis of the whole design.
-- **The safe way to widen coverage is `field_labels` in `reference/policy.json`.** Adding a label can
-  only let the parser *read* something it previously held on; it cannot make it misread. That is why
-  the vocabulary is data. `tests/test_robustness.py` holds 18 plausible layout variations and every
-  one must keep passing — a hold there is lost automation, which the ledger charges for.
-- **`reference/spec-7.json` and `supplier-master.json` are generated.** Hand-editing them is
-  reverted by `make reference` and caught by `make freshness`. `policy.json` is the hand-authored one.
-- **Freshness is not correctness.** `make freshness` compares generator output to generator output;
-  a backwards derivation would pass it. Correctness lives in `tests/test_derivation.py`.
-- **`make placeholders` only catches markers it has been taught**, and has missed unfilled template
-  text twice. If you add a template, add its marker to the grep in the `Makefile`.
-- **The staleness gate will eventually stop the pipeline on purpose.** From 2027-03-01 it warns; from
-  2027-06-01 it refuses to run, because nobody owns telling this repo that SPEC-7 was revised. That is
-  ruling R4 working, not a bug. Re-vendor `reference/source/`, run `make reference`, move the dates.
+## 2. What it deliberately does not do
 
----
+**It never releases a lot.** Your ERP already creates lots at status `held` and treats release as a
+separate action. This system fills in the fields; a person releases, exactly as today. We did not
+take that capability. Adding it later should be a decision you make deliberately, not one that
+arrives with an upgrade.
 
-## 3. Scored against the checklist
+**It does not read PDFs.** Certificates reach it as extracted text. Making OCR production-grade was
+out of scope for this build; the seam where it attaches is defined, and what productionalising it
+involves is written up rather than left to be discovered.
 
-### 1. Documentation completeness
+**It does not call your ERP.** It writes a file. Connecting to the lot-creation endpoint is stage 3
+of the deployment plan and is blocked on questions your teams still own.
 
-| # | Item | Status | Evidence / gap |
-|---|---|---|---|
-| 1.1 | Charter and success criteria current | **Complete** | `docs/overview.md`; the engagement brief |
-| 1.2 | Current-state architecture documented | **Complete** | `docs/architecture.md` — the runtime path and the derived-vs-hand-authored data provenance, both as Mermaid (GitHub renders natively), plus the boundary table. `docs/overview.md` carries the shape |
-| 1.3 | Non-obvious decisions captured | **Complete** | ADR-0001…0007, each with context, consequences and options |
-| 1.4 | Alternatives not chosen, with reasoning | **Complete** | Every ADR carries an "Options considered" section naming what was rejected and why |
-| 1.5 | Confluence pages exist | **N/A / not started** | No Confluence space for this engagement |
-| 1.6 | Handover context digest | **Complete** | This document |
+**It does not guess.** Where it cannot read a field it produces nothing and holds the lot — it never
+produces a plausible-looking wrong number. That is a deliberate trade: a certificate in a layout we
+have not seen is held rather than misread, which costs you a manual keying and protects you from the
+failure that matters.
 
-### 2. Repository inventory and hygiene
+## 3. Decisions we took on your behalf — all reversible
 
-| # | Item | Status | Evidence / gap |
-|---|---|---|---|
-| 2.1 | Master repo index | **N/A** | Single repo |
-| 2.2 | Named per convention | **Complete** | `thornbury-coa-intake` (client-product-component) |
-| 2.3 / 2.4 | Empty / superseded repos | **N/A** | First repo of the engagement |
-| 2.5 | **No code only on a laptop** | **Complete** (2026-09-03) | Pushed to `github.com/techwithshadab/thornbury-coa-intake` (private). Was the worst finding in this package; it is closed |
-| 2.6 | Branches merged or planned | **Complete** | Single `main`; no open branches |
+Twenty-one questions arose that were not ours to answer. Waiting on all of them would have meant
+building nothing, so each carries a **provisional ruling** recorded with its reasoning, its business
+consequence, what it costs if wrong, and **the person at Thornbury who owns the real answer**.
 
-### 3. README and technical documentation
+They are held as reviewed data in `reference/policy.json`, not buried in code, so overturning one is
+a reviewed configuration change rather than a development task. `docs/working-answers.md` explains
+every one.
 
-| # | Item | Status | Evidence / gap |
-|---|---|---|---|
-| 3.1 | README passes the template check | **Complete** | `make placeholders STRICT=1` clean — after the gate was widened twice to catch markers it had been missing |
-| 3.2 | **Setup tested by someone other than the author** | **Half done** | The *environment* half is now proven: CI runs `make setup && make check` on a clean Ubuntu runner carrying none of this machine's tools, and it is green. That is what caught the `pre-commit` defect below. The *human* half is still open — no person other than the author has followed the README |
-| 3.3 | Deployment notes | **Complete** | `docs/deployment.md` — four stages, blockers named |
-| 3.4 | Runbook | **Complete for what exists** | `docs/runbook.md` — run it, check it, the failure table, and when to stop and ask. No monitoring section, because nothing is deployed to monitor |
-| 3.5 | "What's NOT in this repo" filled | **Complete** | `README.md` — and shorter since `engagement/` was vendored |
+The ones carrying the most consequence:
 
-### 4. Size and history
-
-| # | Item | Status | Evidence |
-|---|---|---|---|
-| 4.1 | No venvs / artifacts / caches committed | **Complete** | `make size`; `git ls-files` clean |
-| 4.2 | No large data files | **Complete** | `make size` (5 MB cap) green |
-| 4.3 | History scrubbed where needed | **N/A** | No bloat was ever committed |
-| 4.4 | Complete `.gitignore` | **Complete** | From the standard template, customised — and corrected once, when it was found to be ignoring a deliverable |
-
-### 5–8. Access, security, quality, ownership
-
-| Item | Status | Evidence / gap |
+| We are currently | Because | Yours to settle |
 |---|---|---|
-| Secrets not in code | **Complete** | `gitleaks` + `detect-private-key` on every commit; no credential is used at runtime today |
-| Dependency vulnerabilities | **Complete** | `make audit` in `make check`; caught a real CVE (`pytest` PYSEC-2026-1845) on first run |
-| Access inventory | **Complete** | `docs/access-inventory.md` — nothing is needed today, and every later need is blocked on a question nobody has been asked |
-| SECURITY.md reporting path | **Complete** | `SECURITY.md` |
-| Tests | **Complete** | 84, incl. invariant, negative, mutation, policy-consistency and layout-robustness tests. `make check` green with no skips |
-| CI | **Running, not yet required** | `.github/workflows/check.yml` runs the same `make check` and is **green** (run 33808585169). It is not yet a *required* status check — branch protection is the remaining step (§7). A job that does not block merge is a notification |
-| **Quality attestation (accuracy)** | **NOT STARTED** | No labelled set. No number. See below |
-| **≥2 owners per area** | **FAILING** | `CODEOWNERS` names roles, but one human has touched every line and no second person has reviewed any of it |
+| Holding any lot whose moisture came from loss-on-drying | SPEC-7 §3.2 and §4 — the method is not reportable, so the result cannot release a lot however good the number is | Marisol Vega |
+| Holding any lot from a supplier not on the approved master | Your ERP would refuse it anyway. Three of the thirty-six are in this position, with otherwise clean certificates | IT and Purchasing |
+| Writing the certificate's **retest** date into the ERP's `expiry_date` | It is what your team does today. They are not the same claim, and Purchasing reorders off the result — changing it silently would be a larger intervention than preserving it | Purchasing |
+| Holding rather than calculating a missing retest date | Every certificate carrying both sets retest at manufacture + 24 months, so it *could* be calculated. Inventing a date that drives your reordering is not ours to do | Purchasing |
+| Holding any date that reads two ways | A date resolved from a supplier's *other* paperwork is a guess about this document. Three certificates are affected | Denis Achebe |
 
----
+**Three decisions we declined outright**, because a wrong answer would bind you to something hard to
+undo: whether the system may release a lot, where a confidence threshold should sit once one exists,
+and what `expiry_date` ought to mean. `docs/working-answers.md` records what we did instead.
 
-## 4. The four things a receiving team should know are missing
+## 4. What we need from you
 
-Ranked by how much they should worry you.
+`docs/open-questions.md` carries all twenty-one with the evidence behind each; `docs/questions-to-send.md`
+has them drafted as notes, one per person. **None currently has an owner or a date, and that is the
+largest risk to this work.** Three block progress rather than merely shadow it:
 
-**1. Nobody has reviewed this.** One author, no second pair of eyes, no PR ever raised. Every ADR is
-self-signed; `reviews/2026-08-29-conformance.md` is explicitly marked self-assessed and unaccepted.
-The engine's axiom is that the *receiver* accepts, and no receiver has. The remote and CI are now in
-place, so the remaining fix is human: **make `check` required with CODEOWNERS review, and have someone
-who did not build it read `policy.json` and the ADR-0006/0008 pair first.**
+1. **What should go in `expiry_date`?** Your ERP requires it, no certificate states it, and two of
+   the thirty-six carry no retest date at all. *Purchasing has not been engaged.*
+2. **When the ERP and the QA tracker disagree, which is authoritative?** This decides what "correct"
+   means, so every other answer inherits from it. It has been open for years; this work forces it.
+   *Marisol Vega was not at the kick-off and should have been.*
+3. **Are Fenwick Commodity Ltd, Aksoy Gıda Ticaret AŞ and Baltic Provisions UAB approved suppliers?**
+   They are not on the master you gave us and their certificates are otherwise clean. Either the
+   master is out of date, or material is arriving from unapproved sources. **This is worth someone
+   looking at today, independently of this project.**
 
-**2. There is no labelled set, so there is no accuracy number.** Everything this repo says about its
-own behaviour is arithmetic over 36 documents. The 21/15 split matching the hand analysis exactly is
-a consistency check between two routes that are *both ours* — it is not independent evidence.
-**Fix: ~200 certificates with a QA analyst's accept/hold and reason. It blocks the B2 go-live gate
-and it can start today, in parallel with everything else.**
+**One finding to put in front of Quality.** Eighteen of the thirty-six certificates — half — contain
+something your own specification says a person must look at. Denis's estimate was a handful a month
+out of roughly sixteen hundred. Either the set you sent was chosen to be difficult, or the current
+process is missing a great deal. We cannot tell from inside the sample, and the two readings point in
+very different directions commercially.
 
-**3. Twenty-one questions have no owner and no date.** Three of them block work outright: what goes
-in `expiry_date` (Purchasing, never engaged), whether the ERP or QA tracker is authoritative
-(unassigned; Marisol Vega never engaged), and whether three suppliers in the sample are genuinely
-unapproved (IT). Notes are drafted in `docs/questions-to-send.md` and **have not been sent**.
+## 5. What is not finished
 
-**4. Half the supplied sample carries an anomaly.** 18 of 36, against the intake lead's estimate of
-"a handful a month" out of ~1,600. Either the corpus was enriched for teaching, or the current manual
-process misses a great deal. We cannot tell from inside the sample, and the answer changes the
-business case in opposite directions. **Do not quote rates from this corpus as production estimates.**
+**There is no evaluation set, so there is no accuracy number.** This is the most important gap. Every
+figure here is arithmetic over thirty-six documents. A real quality claim needs roughly two hundred
+certificates carrying a QA analyst's accept/hold decision and reason — your tracker's `note` column
+is the closest existing source. Until that exists, no responsible attestation can be made about how
+well this performs, by us or by anyone else.
 
----
+**Nobody outside the build has reviewed it.** One person wrote it and no second engineer has read a
+line. The repository's own gate record in `reviews/` states this rather than glossing it.
 
-## 5. Your first week
+**It is not deployed.** `docs/deployment.md` sets out four stages, each shippable, with the blockers
+named. Stage 1 — running it by hand and reviewing the output — needs nothing from anyone and can
+begin now.
 
-**Day 1 — make it yours.** Clone, `make setup`, `make check`, `make submission`. The corpus is
-vendored at `engagement/`, so there is nothing to locate. If `make check` is not green on your
-machine, that is a defect in this repo or its README and it is the most valuable bug you will find
-this week — say so rather than working around it. `make submission` regenerates the three submitted
-runs and asserts they are byte-identical to each other; `git diff submissions/` should be empty.
+**A question we did not ask at kick-off and should have:** your volume, your peak, and whether there
+is a turnaround expectation on a held lot. We have "north of four hundred a week" and nothing else.
 
-**Day 2 — read the rulings, not the code.** `docs/working-answers.md`, then `reference/policy.json`.
-Twenty-one decisions were made on the client's behalf. You are inheriting all of them and you should
-disagree with some. **ADR-0008 supersedes ADR-0006 and is worth reading as a pair** — it removes a
-rule whose threshold had been calibrated on the single case it admitted. That is the shape of
-disagreement this repo expects from you. Start there.
+## 6. Running it
 
-**Day 3 — push it to a remote and make `check` a required status check.** This closes checklist 2.5
-and turns the existing workflow into an actual gate. Highest ratio of value to effort in the repo.
-Exact commands in §8.
+Full detail in `docs/runbook.md`; the short version:
 
-**Day 4 — send the notes.** `docs/questions-to-send.md`, in the stated order: Denis first, then Priya
-(two of the remaining three notes need names only she can give), Marisol once Denis has introduced
-you. Do not cold-email Marisol.
+```bash
+make setup        # once
+make submission   # runs the supplied corpus, validates it, proves the runs identical
+make run DOCS=<your documents directory> OUT=decisions.jsonl
+```
 
-**Day 5 — start the labelled set.** Nothing else you do this week compounds as much.
+Two things worth knowing in operation:
 
----
+**Held lots go to four desks, not one queue.** A lot held because a date was unreadable returns to
+intake to key by hand — the process that handles all your volume today, so it is not new work. A lot
+held because it breaches SPEC-7 goes to Quality. Collapsing those into one "exceptions" pile would
+put a ninety-second keying job behind a quality investigation, and would overwhelm the team this is
+meant to help.
 
-## 6. Who to ask
+**The system will eventually stop on purpose.** It holds a copy of SPEC-7 rev D. Nobody currently
+owns telling it that a revision has issued, so it warns from March 2027 and refuses to run from June
+2027 rather than quietly applying withdrawn limits. That is a safeguard rather than a fault — and the
+real fix is a notification path someone at Quality owns.
 
-| About | Person | State |
-|---|---|---|
-| SPEC-7, methods, what counts as a result | Marisol Vega, Quality Manager | **Never engaged.** Owns the most unresolved surface |
-| Certificates, suppliers, what intake actually does | Denis Achebe, Intake Team Lead | Engaged, helpful, gave the best material we have |
-| Scope, budget, the ERP lot record | Priya Raghunathan, Director of Supply Operations | Sponsor |
-| `expiry_date`, reorder logic | Purchasing | **No named contact.** Ask Priya |
-| ERP endpoint, supplier master, change process | IT | **No named contact.** Ask Priya |
-| This repo | solutioner of record (`engine.yaml`) | Sole author of every line |
+## 7. Acceptance
 
----
-
-## 7. Publishing it
-
-**Done, 2026-09-03** — `github.com/techwithshadab/thornbury-coa-intake`, private. Kept here because the
-remaining step is not.
-
-**What publishing immediately bought.** The workflow had never executed, and it **failed on its first
-run**. `make check` had been invoking whatever `pre-commit` was on `PATH`; this machine has one via
-Homebrew, a clean runner does not, so the hygiene gate reported that it had not run and failed. The
-earlier "clean clone" verification had missed it because the clone was on the *same machine* — a clone
-in another directory is not a clone elsewhere, which is precisely the trap the repo-fitness rubric
-names and which we walked into while quoting it. `pre-commit` is now a pinned dev dependency. **CI was
-the first genuinely independent environment this repo ever ran in, and it found a real defect in 12
-seconds.**
-
-**Private, not public.** `reference/source/` holds vendored copies of Thornbury's SPEC-7 and supplier
-master. They are framed as controlled client documents, and a repo that reads as client QMS material
-does not belong in a public namespace regardless of its provenance.
-
-**Still outstanding — branch protection.** In **Settings → Branches → Add rule** for `main`:
-- Require a pull request before merging
-- Require status checks to pass → select **`check`**
-- Require review from Code Owners (`CODEOWNERS` already routes `/decisions/`, `/reference/` and
-  `CLAUDE.md`)
-
-The last of those is what makes `CODEOWNERS` more than a text file, and it is what would have caught
-the fact that one person has reviewed every line of this repo.
-
-Until those are set, `check` runs but does not block a merge, and `CODEOWNERS` is a text file rather
-than a gate. The second of them is what would catch the fact that one person has reviewed every line
-here.
-
----
-
-## 8. Sign-off
-
-Handover is not complete until a receiver signs. Per the checklist's own rule, sign against the
-artifact, not against this table.
+This package is producer-written and has not been accepted. Nothing in it should be read as an
+attestation. MathCo's own readiness scoring is a separate internal record and is not reproduced here.
 
 | Role | Name | Decision | Date |
 |---|---|---|---|
-| Workstream Tech Lead | TBD | pending | |
-| Delivery Lead | TBD | pending | |
+| Director of Supply Operations | Priya Raghunathan | pending | |
+| Quality Manager | Marisol Vega | pending | |
+| Intake Team Lead | Denis Achebe | pending | |
 
-**This package is producer-written and unaccepted.** Nothing in it should be read as an attestation.
+**Before signing, we would rather you pushed on:** the three blocking questions in §4, the absence of
+an evaluation set in §5, and the supplier finding — which we think deserves attention regardless of
+what happens to this project.

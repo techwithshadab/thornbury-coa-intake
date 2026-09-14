@@ -56,6 +56,22 @@ supplier the file says must never be inferred.
 **Bump `domain.SCHEMA_VERSION`** if the shape of an emitted decision changes, and add a `CHANGELOG`
 entry in the same commit.
 
+## Repository settings that are not yet set
+
+CI runs `make check` on every push and pull request and is green, and it also gates that the
+committed submission still reproduces. It is **not yet a required status check**, so a red run does
+not block a merge and `CODEOWNERS` is a text file rather than a review requirement.
+
+In **Settings → Branches → Add rule** for `main`:
+
+- Require a pull request before merging
+- Require status checks to pass → select **`check`**
+- Require review from Code Owners
+
+The third is the one that matters most here: `CODEOWNERS` already routes `/decisions/`, `/reference/`
+and `CLAUDE.md`, and turning it on is what would catch the fact that a single person has reviewed
+every line of this repository.
+
 ## When to stop and ask
 
 - The decision looks wrong and `policy.json` says it is right → that is a **ruling** you disagree

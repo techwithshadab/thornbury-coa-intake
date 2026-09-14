@@ -1,12 +1,14 @@
 # Working log — how AI was used on this build
 
-> Deliverable 6. An account of where AI was a thought partner, where it taught me a domain I am not
-> expert in, and where it executed work I then verified — plus what it got wrong.
+> Deliverable 6. The brief asks for an account of where AI acted as a thought partner, where it was
+> used to learn an unfamiliar domain, and where it executed work that was then verified — plus at
+> least one thing it got wrong or that was overruled.
 >
-> **Drafted from the session record; the judgements are mine to confirm.** Where this log says "I
-> decided", check that it matches your memory before you sign it. A working log written by the tool
-> it is reporting on has an obvious conflict of interest, and the honest response is to say so at the
-> top rather than to write around it.
+> **Drafted from the session record; every judgement here is the author's to confirm before signing.**
+> A working log written by the tool it reports on has an obvious conflict of interest, and the honest
+> response is to say so at the top rather than write around it. Anything below that describes *the
+> author* rather than *the work* needs checking line by line — see item 9, which is exactly that
+> failure caught in this file.
 
 ---
 
@@ -49,35 +51,39 @@ the change that flips each one named in the manifest.
 
 ---
 
-## Where I used it to learn a domain I am not expert in
+## Where I used it to learn the domain
 
-I have no background in pharmaceutical or food-ingredient quality management. Three things AI taught
-me that I have since checked against SPEC-7 itself:
+Ingredient acceptance is a specialist field, and three things in it drove the design while being
+non-obvious from the materials on a first read. In each case AI supplied the reasoning **and the
+section reference**, and the section was then read directly — which is the only reason these are
+defensible in a room with Quality, rather than repeated on trust.
 
-**Why the analytical method is not metadata.** SPEC-7 §3.1 says a result is only reportable when
-produced by the named method. So a moisture value from loss-on-drying is not a slightly-worse
-moisture value — it is not a result at all for acceptance purposes. That is why the method check runs
-*before* the limits check in `app.py`, and why three certificates with every number in range are
-still held.
+**The analytical method is not metadata.** SPEC-7 §3.1 says a result is reportable only when produced
+by the named method. So a moisture value from loss-on-drying is not a slightly-worse moisture value —
+it is not a result at all for acceptance purposes. That is why the method check runs *before* the
+limits check in `app.py`, and why three certificates with every number in range are still held.
 
-**Why `moisture` and `water content` can honestly be both the same and different.** Karl Fischer
-measures water; loss on drying measures water plus anything else volatile. Two people can both be
-right about the same lot. That reframed Q1 from a vocabulary question into a method question — and it
-remains a hypothesis for Marisol Vega to rule on, not something I am qualified to settle.
+**`moisture` and `water content` can honestly be both the same and different.** Karl Fischer measures
+water; loss on drying measures water plus anything else volatile. Two people can be describing the
+same lot and both be right. That reframed Q1 from a vocabulary dispute into a method question — and
+it stays a hypothesis for Marisol Vega to rule on, not something this project settles.
 
-**Why retest and expiry are different claims.** A retest date says "re-examine by then"; an expiry
-date says "this is finished." The ERP conflates them and Purchasing reorders off the result. I would
-have mapped one to the other without noticing.
+**Retest and expiry are different claims.** A retest date says "re-examine by then"; an expiry date
+says "this is finished." The ERP conflates them and Purchasing reorders off the result. Without the
+distinction, mapping one onto the other looks like a field rename rather than a decision with a
+consequence.
 
-In each case AI gave me the reasoning and the section reference, and I read the section. **That is
-the only reason I would defend these in a room with Marisol** — not because AI said so.
+*(An earlier draft of this section opened with a sentence about the author's professional background.
+AI wrote it, in the first person, having no basis for the claim — a small but real instance of the
+failure mode the rest of this log documents. It is listed at item 9 below.)*
 
 ---
 
 ## Where it executed work I then verified
 
-Governance scaffold, the deterministic parser, the SPEC-7 rules, `reference/policy.json`, 62 tests,
-seven ADRs, the analysis documents, the deployment plan, the handover package.
+Governance scaffold, the deterministic parser, the SPEC-7 rules, `reference/policy.json`, 146 tests,
+eight ADRs, the analysis documents, the architecture diagrams, the deployment plan, the handover
+package.
 
 **How I verified it, in descending order of how much I trust each:**
 
@@ -158,8 +164,23 @@ paperwork is the same class of move — the only thing separating them was a thr
 that threshold had been calibrated on the single case it admitted. It cost one document.
 
 The reason this belongs in a log about AI use: **AI wrote the weakness down accurately and built the
-thing anyway.** Documenting a flaw is not the same as acting on it, and I had read that ADR twice
-before the inconsistency registered.
+thing anyway.** Documenting a flaw is not the same as acting on it — the ADR named its own soft spot
+in plain language and that did not stop the rule shipping, or prompt a second look, until the
+question was put directly.
+
+---
+
+**9. It wrote biography it had no basis for, in the first person, in a document I would sign.** The
+working log's domain section opened with "I have no background in pharmaceutical or food-ingredient
+quality management." Nobody said that. AI inferred a professional history from the fact that it had
+been asked to explain SPEC-7, and wrote the inference as my own words. Elsewhere it asserted I had
+"read that ADR twice."
+
+Both are small. Both are fabrication about a real person, in the one deliverable whose entire value
+is that it is honest about how the work was done. The general form is worth more than the instance:
+**a tool writing in your voice will fill gaps in what it knows about you with something plausible**,
+and plausible reads exactly like true. Everything a document says about *you*, rather than about the
+work, needs checking line by line — which is why this file opens by saying so.
 
 ---
 
@@ -175,9 +196,10 @@ three of six deliverables did not exist, and a tech-stack decision (deterministi
 had never actually been made despite three prior commitments constraining it. Every one of those
 sweeps was cheap. None was volunteered.
 
-**Treat confident output as a draft, especially numbers.** The corrections above were not caught by
-disagreeing with AI's reasoning — the reasoning was usually fine. They were caught by re-deriving a
-figure, running the thing, or reading the source.
+**Treat confident output as a draft, especially numbers — and especially anything written in my
+voice.** The corrections above were not caught by disagreeing with AI's reasoning; the reasoning was
+usually fine. They were caught by re-deriving a figure, running the thing, reading the source, or
+noticing a sentence that claimed something about me.
 
 ---
 

@@ -22,7 +22,7 @@ documents: **21 accept, 15 hold**.
 **That split is arithmetic, not a measurement.** There is no labelled set, so nothing here is an
 accuracy claim — including the fact that the split matches the hand analysis in `docs/working-answers.md`
 document for document, since both routes to that answer are ours. See `STATUS.md` for what is missing
-and `docs/handover.md` for what a receiving team would be inheriting.
+and `docs/handover.md` for what Thornbury is receiving.
 
 ## The shape
 - **Repo kind / surfaces:** `rules-engine`, `criticality: regulated`. True: `has_consumers`,
@@ -81,7 +81,7 @@ docs/
   working-answers.md  the provisional ruling on each, and what it costs if wrong
   questions-to-send.md  those questions drafted as notes, one per stakeholder
   deployment.md       how this gets to production, in four stages
-  handover.md         what a receiving team inherits, scored against the engine checklist
+  handover.md         the client handover — MathCo to Thornbury
   working-log.md      how AI was used on this build, and what it got wrong
   reference/          how each part works TODAY
 decisions/        append-only ADRs
@@ -96,7 +96,7 @@ REPO-SURFACE.yaml what this repo is (the router for the repo-fitness bar)
   provisional, reversible ruling per question, with the business consequence of each
 - Those questions drafted as sendable notes → [`docs/questions-to-send.md`](questions-to-send.md)
 - **How this reaches production → [`docs/deployment.md`](deployment.md)**
-- **What a receiving team inherits → [`docs/handover.md`](handover.md)**
+- **The client handover, MathCo to Thornbury → [`docs/handover.md`](handover.md)**
 - How AI was used, and what it got wrong → [`docs/working-log.md`](working-log.md)
 - **The mechanism, with diagrams → [`docs/architecture.md`](architecture.md)**
 - Engineering contract & invariants → `CLAUDE.md`

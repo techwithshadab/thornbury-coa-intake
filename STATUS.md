@@ -55,7 +55,7 @@ What remains is not code:
   shape of disagreement this repo expects.
 - **Make `check` a required status check.** CI runs and is green; branch protection is unset, so a
   red run does not block a merge and `CODEOWNERS` is a text file rather than a gate. Settings are in
-  `docs/handover.md` §7.
+  `docs/runbook.md`.
 - **Send the notes** in `docs/questions-to-send.md` — Denis first; two of the others need names only
   Priya can give.
 
@@ -68,7 +68,7 @@ which was a bigger gap than anything technical it turned up.
 | 1 | A working slice | **done for the supplied corpus** — parser + rules green, 21/15 |
 | 2 | A deployment plan that actually works | **done** — [`docs/deployment.md`](docs/deployment.md), four stages, blockers named |
 | 3 | Decision records | **done** — ADR-0001…0008, one superseding another after review |
-| 4 | A handover package | **done** — [`docs/handover.md`](docs/handover.md), scored against the engine checklist |
+| 4 | A handover package | **done** — [`docs/handover.md`](docs/handover.md), written to the client. The readiness scoring is a separate internal gate record in `reviews/` |
 | 5 | `decisions.jsonl` | **done** — `submissions/decisions.jsonl`, passes `validate_submission.py` |
 | 6 | A working log — how AI was used, incl. what it got wrong | **drafted** — [`docs/working-log.md`](docs/working-log.md); needs your sign-off on the judgements |
 
